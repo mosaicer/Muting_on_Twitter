@@ -18,7 +18,7 @@ __This user script change tweets' style.__
   - texts(contents) of tweets are emphasized.
 * On user pages(ex. //twitter.com/twitter)
   - tweets' height get smaller.
-***
+==========
 #### Muting+α on TwitterはGreasemonkeyのユーザースクリプトです。
 #### このユーザースクリプトはGreasemonkeyがインストールされたFirefoxで動きます。
 __このユーザースクリプトは、テキスト/リンク/タグをミュートすることができます。__
