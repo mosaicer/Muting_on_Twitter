@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Muting texts/links/tags on "Twitter Web Client" and changing tweets' style
-// @version     1.0
+// @version     1.1
 // @include     https://twitter.com/*
 // @exclude     https://twitter.com/settings/*
 // @grant       GM_registerMenuCommand
@@ -15,7 +15,8 @@
 
 // ページを読み込んだ後に実行
 $(function() {
-  if(window.location.href == "https://twitter.com/") { // ホームの時
+  // ホームの時
+  if(window.location.href == "https://twitter.com/") {
     // インストール時の設定
     var flagAry = ["mute_text_flag", "mute_link_flag", "mute_tag_flag", "style_flag", "form_flag", "lang_flag"];
     for(var i = 0; i < flagAry.length; i++) {
@@ -30,22 +31,25 @@ $(function() {
             alert("Finish setting it.\nYou can change the language you use to Japanese by acsessing User Script Command");
         }
       } else {
+        // インストール後、最初のアクセスの時、全ての機能を有効にする
         if(typeof GM_getValue(flagAry[i]) == 'undefined')
-          GM_setValue(flagAry[i], 1); // インストール後、最初のアクセスの時、全ての機能を有効にする
+          GM_setValue(flagAry[i], 1);
       }
     }
     // セットされているミュートする文字列を取ってくる
     var muteNameAry = ["mute_words", "mute_links", "mute_tags"];
     for(var i = 0; i < muteNameAry.length; i++) {
       if(typeof GM_getValue(muteNameAry[i]) != 'undefined') {
-        if(GM_getValue(muteNameAry[i]).indexOf(",/") != -1) { // 2つ以上単語がある場合
+        // 2つ以上単語がある場合
+        if(GM_getValue(muteNameAry[i]).indexOf(",/") != -1) {
           var tempMuteAry = GM_getValue(muteNameAry[i]).split(",/");
           switch(i) {
             case 0: var muteWordAry = tempMuteAry; break;
             case 1: var muteLinkAry = tempMuteAry; break;
             case 2: var muteTagAry = tempMuteAry; break;
           }
-        } else { // 1つしか単語がない場合
+        // 1つしか単語がない場合
+        } else {
           var tempMuteVar = GM_getValue(muteNameAry[i]);
           switch(i) {
             case 0: var muteWordAry = tempMuteVar; break;
@@ -61,9 +65,10 @@ $(function() {
     if(GM_getValue("style_flag") == 1)
       tweetStyleChange(); // 各ツイートを装飾する
     muteTweet(); // ツイートをミュートする
-  } else { // 各ユーザーページの時
-    userPageStyleChange();
   }
+  // 各ユーザーページの時
+  else
+    userPageStyleChange();
 
 
   // 追加のページの読み込みを監視して実行-----------------------------------------------------------------------
@@ -77,11 +82,11 @@ $(function() {
       if(window.location.href == "https://twitter.com/") {
         if(GM_getValue("style_flag") == 1)
           tweetStyleChange();
-        if(mutation.addedNodes.length != 0) // 空の時は通さない
+        // 空じゃない時
+        if(mutation.addedNodes.length != 0)
           muteTweet(mutation.addedNodes); // 追加されたノードを渡す
-      } else if(mutation.addedNodes.length != 0) {
+      } else if(mutation.addedNodes.length != 0)
         userPageStyleChange(mutation.addedNodes);
-      }
     });
   });
   observer.observe(target, {childList: true } );
@@ -213,7 +218,7 @@ $(function() {
       "申し訳ないですが、ミュートする文字列に,/は使うことができません"],
       ["The word is already set for mute word", "The word can not be deleted", 
       "The word is not set for mute word", "↓The mute words separated by conmma↓\n\n", 
-      "The mute words are not found", "I'm sorry, the mute words which contains the word ',/' can not be set"]
+      "The mute words are not found", "Sorry, the mute words which contains the word ',/' can not be set"]
     ];
     var altMsg = [];
     for(var i = 0; i < 6; i++) {
@@ -276,88 +281,95 @@ $(function() {
   // ミュートする文字列を追加する
   function addMuteLtr(add_ltr, btn_flag, btnMsg) {
     var splLtr = /,\//;
-    if(add_ltr.match(splLtr)) { // 区切り文字が含まれている場合
+    // 区切り文字が含まれている場合
+    if(add_ltr.match(splLtr)) {
       alert(btnMsg[5]);
-    } else if(add_ltr != "") { // 未入力の場合は何も起こらない
+    // 未入力の場合ではない時
+    } else if(add_ltr != "") {
       switch(btn_flag){
         case 0: if(typeof GM_getValue(muteNameAry[0]) != 'undefined') var muteLtrAry = muteWordAry; break;
         case 1: if(typeof GM_getValue(muteNameAry[1]) != 'undefined') var muteLtrAry = muteLinkAry; break;
         case 2: if(typeof GM_getValue(muteNameAry[2]) != 'undefined') var muteLtrAry = muteTagAry; break;
       }
-      if(typeof GM_getValue(muteNameAry[btn_flag]) == 'undefined' || muteLtrAry == "") { // 初めてor空に、追加する時
+      // 初めてor空に、追加する時
+      if(typeof GM_getValue(muteNameAry[btn_flag]) == 'undefined' || muteLtrAry == "") {
         GM_setValue(muteNameAry[btn_flag], add_ltr);
         location.href = "https://twitter.com/";
+      // すでに入ってる状態の時
       } else {
         var cnt = 0;
-        var muteLtrTemp = null;
-        if(GM_getValue(muteNameAry[btn_flag]).indexOf(",/") != -1) { // 2つ以上単語がある場合
-          muteLtrTemp = muteLtrAry[0];
-          if(muteLtrAry[0] == add_ltr) // 重複しているかどうかをチェック
-            cnt++;
-          for (var i = 1; i < muteLtrAry.length && cnt == 0; i++) {
-            muteLtrTemp = muteLtrTemp + ",/" + muteLtrAry[i]; // ,/で区切って単語を繋げていく
+        // 2つ以上単語がある場合
+        if(muteLtrAry.indexOf(",/") != -1) {
+          for (var i = 0; i < muteLtrAry.length && cnt == 0; i++) {
+            if(i != 0)
+              muteLtrTemp = muteLtrTemp + ",/" + muteLtrAry[i]; // ,/で区切って単語を繋げていく
+            else
+              var muteLtrTemp = muteLtrAry[i];
+            // 重複チェック
             if(muteLtrAry[i] == add_ltr)
               cnt++;
           }
-        } else { // 1つしか単語がない場合
-          muteLtrTemp = muteLtrAry;
+        // 1つしか単語がない場合
+        } else {
+          var muteLtrTemp = muteLtrAry;
           if(muteLtrAry == add_ltr)
             cnt++;
         }
-        if(cnt == 0) { // 重複していない時
+        // 重複していない時
+        if(cnt == 0) {
           muteLtrTemp = muteLtrTemp + ",/" + add_ltr; // 入力された文字を最後に追加
           GM_setValue(muteNameAry[btn_flag], muteLtrTemp); // ミュートする文字列を再設定
           location.href = "https://twitter.com/";
-        } else {
-          alert(btnMsg[0]);
         }
+        // 重複している時
+        else
+          alert(btnMsg[0]);
       }
     }
   }
   // ミュートする文字列を削除する
   function delMuteLtr(del_ltr, btn_flag, btnMsg) {
-    if(del_ltr != "") { // 未入力の場合は何も起こらない
+    // 未入力ではない時
+    if(del_ltr != "") {
       switch(btn_flag){
         case 0: if(typeof GM_getValue(muteNameAry[0]) != 'undefined') var muteLtrAry = muteWordAry; break;
         case 1: if(typeof GM_getValue(muteNameAry[1]) != 'undefined') var muteLtrAry = muteLinkAry; break;
         case 2: if(typeof GM_getValue(muteNameAry[2]) != 'undefined') var muteLtrAry = muteTagAry; break;
       }
-      if(typeof GM_getValue(muteNameAry[btn_flag]) == 'undefined' || muteLtrAry == "") { // 文字列が入ってない時
+      // 文字列が入ってない時
+      if(typeof GM_getValue(muteNameAry[btn_flag]) == 'undefined' || muteLtrAry == "") {
         alert(btnMsg[1]);
+      // 文字列がセットされている時
       } else {
         var cnt = 0; // 削除された回数をカウント
-        var muteLtrTemp = null;
-        if(GM_getValue(muteNameAry[btn_flag]).indexOf(",/") != -1) { // 2つ以上単語がある場合
-          if(muteLtrAry[0] != del_ltr) // 入力された文字が入っているかチェック
-            muteLtrTemp = muteLtrAry[0];
-          else
-            cnt++;
-          for (var i = 1; i < muteLtrAry.length; i++) {
+        var muteLtrTemp = "";
+        // 2つ以上単語がある場合
+        if(muteLtrAry.indexOf(",/") != -1) {
+          for(var i = 0; i < muteLtrAry.length; i++) {
             if(muteLtrAry[i] != del_ltr) {
-              if(muteLtrTemp != null)
+              if(muteLtrTemp != "")
                 muteLtrTemp = muteLtrTemp + ",/" + muteLtrAry[i];
               else
-                muteLtrTemp = muteLtrAry[i]; // 最初に入れる時は",/"なしで格納
-            } else {
-              cnt++;
+                muteLtrTemp = muteLtrAry[i];
             }
+            else
+              cnt++;
           }
-        } else { // 1つしか単語がない場合
+        // 1つしか単語がない場合
+        } else {
           if(muteLtrAry != del_ltr)
             muteLtrTemp = muteLtrAry;
           else
             cnt++;
         }
-        if(cnt != 0) { // 入力された文字が削除された時
-          if(muteLtrTemp == null) {
-            GM_setValue(muteNameAry[btn_flag], ""); // 何も亡くなった場合は空を格納
-          } else {
-            GM_setValue(muteNameAry[btn_flag], muteLtrTemp); // ミュートする文字列を再設定
-          }
+        // 入力された文字が削除された時
+        if(cnt != 0) {
+          GM_setValue(muteNameAry[btn_flag], muteLtrTemp); // ミュートする文字列を再設定
           location.href = "https://twitter.com/";
-        } else {
-          alert(btnMsg[2]);
         }
+        // 入力された文字が削除されなかった時
+        else
+          alert(btnMsg[2]);
       }
     }
   }
@@ -368,11 +380,12 @@ $(function() {
       case 1: if(typeof GM_getValue(muteNameAry[1]) != 'undefined') var muteLtrAry = muteLinkAry; break;
       case 2: if(typeof GM_getValue(muteNameAry[2]) != 'undefined') var muteLtrAry = muteTagAry; break;
     }
-    if(typeof GM_getValue(muteNameAry[btn_flag]) != 'undefined'  && typeof muteLtrAry != 'undefined' && muteLtrAry != "") {
+    // ミュートする文字列が設定されていた時
+    if(typeof GM_getValue(muteNameAry[btn_flag]) != 'undefined'  && typeof muteLtrAry != 'undefined' && muteLtrAry != "")
       alert(btnMsg[3] + muteLtrAry);
-    } else {
+    // ミュートする文字列が設定されていなかった時
+    else
       alert(btnMsg[4]);
-    }
   }
 
   // 各ツイートを装飾する
@@ -389,17 +402,22 @@ $(function() {
     $("div[class='promptbird promptbird-below-black-bar']").remove(); // 人と繋がるバナーを消去
 
     var homeTweets = [];
-    if(typeof addedTweets != 'undefined') // ノードが追加された時
+    // ノードが追加された時
+    if(typeof addedTweets != 'undefined')
       homeTweets = addedTweets;
+    // ノードが追加されなかった時
     else
       homeTweets = document.querySelectorAll("li[data-item-type='tweet']"); // 各ツイートの大元
 
     for (var i = 0; i < homeTweets.length; i++) {
       tweetPrnt = homeTweets[i]; // ミュートする時に参照する
-      if(typeof tweetPrnt.childNodes[1].childNodes[3] != 'undefined') // <LI>タグ内が空ではない時
+      // <LI>タグ内が空ではない時
+      if(typeof tweetPrnt.childNodes[1].childNodes[3] != 'undefined')
         tweetPtag = tweetPrnt.childNodes[1].childNodes[3].childNodes[3]; // 要素を判断する時に参照する
-      if(typeof tweetPtag == 'undefined') { // 返信のツイートかどうか
-        for(var j = 3; typeof tweetPrnt.childNodes[1].childNodes[j] != 'undefined'; j++) { // 要素がある場合
+      // 返信のツイートである時
+      if(typeof tweetPtag == 'undefined') {
+        // 要素がある場合
+        for(var j = 3; typeof tweetPrnt.childNodes[1].childNodes[j] != 'undefined'; j++) {
           var replyPrnt = tweetPrnt.childNodes[1].childNodes[j];
           if(typeof replyPrnt.childNodes[1] != 'undefined' && replyPrnt.childNodes[1].getAttribute("data-you-block")) {
             tweetPrnt = replyPrnt;
@@ -408,27 +426,34 @@ $(function() {
             tweetPrnt = homeTweets[i]; // 値を元に戻す
           }
         }
-      } else { // 返信ではない場合
-        tweetElmChk(tweetPtag);
       }
+      // 返信ではない場合
+      else
+        tweetElmChk(tweetPtag);
     }
   }
 
   // ツイート内の要素を判断する
   function tweetElmChk(twtPtag) {
-    for(var i = 0; typeof twtPtag.childNodes[i] != 'undefined'; i++) { // <P>タグのi番目の要素がある場合
+    // <P>タグのi番目の要素がある場合
+    for(var i = 0; typeof twtPtag.childNodes[i] != 'undefined'; i++) {
       tweetElmnt = twtPtag.childNodes[i]; // ミュートする時に参照する
-      if(tweetElmnt.nodeName == 'A') { // <A>タグの時
-        if(tweetElmnt.getAttribute("data-pre-embedded")) { // pic.twitter.com
+      // <A>タグの時
+      if(tweetElmnt.nodeName == 'A') {
+        // pic.twitter.com
+        if(tweetElmnt.getAttribute("data-pre-embedded")) {
           tweetElmnt.href = "http://" + tweetElmnt.childNodes[0].nodeValue; // 元のURLでジャンプさせる
           muteLtrFunc(1);
-        } else if(tweetElmnt.getAttribute("title")) { // pic.twitter.com以外のリンク
+        // pic.twitter.com以外のリンク
+        } else if(tweetElmnt.getAttribute("title")) {
           tweetElmnt.href = tweetElmnt.getAttribute("title");
           muteLtrFunc(1);
-        } else if(tweetElmnt.getAttribute("data-query-source")) { // ハッシュタグ
+        // ハッシュタグ
+        } else if(tweetElmnt.getAttribute("data-query-source")) {
           muteLtrFunc(2);
         }
-      } else if(tweetElmnt.nodeName == '#text') { // テキストの時
+      // テキストの時
+      } else if(tweetElmnt.nodeName == '#text') {
         muteLtrFunc(0);
       }
     }
@@ -442,7 +467,8 @@ $(function() {
       case 2: if(typeof GM_getValue(muteNameAry[2]) != 'undefined') var muteLtrFuncAry = muteTagAry; break;
     }
     if(typeof GM_getValue(muteNameAry[mute_flag]) != 'undefined' && GM_getValue(flagAry[mute_flag]) == 1 && muteLtrFuncAry != "") {
-      if(GM_getValue(muteNameAry[mute_flag]).indexOf(",/") != -1) { // 2つ以上単語がある場合
+      // 2つ以上単語がある場合
+      if(muteLtrFuncAry.indexOf(",/") != -1) {
         for(var i = 0; i < muteLtrFuncAry.length; i++) {
           var muteLtr = new RegExp( preg_quote(muteLtrFuncAry[i]) );
           switch(mute_flag){
@@ -451,7 +477,8 @@ $(function() {
             case 2: muteTagFunc(muteLtr); break;
           }
         }
-      } else { // 1つしか単語がない場合
+      // 1つしか単語がない場合
+      } else {
         var muteLtr = new RegExp( preg_quote(muteLtrFuncAry) );
         switch(mute_flag){
           case 0: muteTextFunc(muteLtr); break;
@@ -469,10 +496,12 @@ $(function() {
   }
   // ツイートのリンクについてミュートする
   function muteLinkFunc(targetMuteLtr) {
-    if(tweetElmnt.getAttribute("title")) { // pic.twitter.com以外のリンク
+    // pic.twitter.com以外のリンク
+    if(tweetElmnt.getAttribute("title")) {
       if(tweetElmnt.getAttribute("title").match(targetMuteLtr))
         $(tweetPrnt).remove();
-    } else if(tweetElmnt.childNodes[0].nodeValue.match(targetMuteLtr)) { // pic.twitter.com
+    // pic.twitter.com
+    } else if(tweetElmnt.childNodes[0].nodeValue.match(targetMuteLtr)) {
       $(tweetPrnt).remove();
     }
   }
@@ -496,24 +525,26 @@ $(function() {
       var tweetDivtag = userTweets[i].childNodes[1].childNodes[1].childNodes[1].childNodes[3]; // div.ProfileTweet-contents
       tweetDivtag.childNodes[1].style.fontSize = '12px';
       tweetDivtag.childNodes[1].style.lineHeight = '18px';
-      if(tweetDivtag.childNodes[3].nodeName == 'DIV') { // 詳細or概要がある場合
+      // 詳細or概要がある場合
+      if(tweetDivtag.childNodes[3].nodeName == 'DIV') {
         tweetDivtag.childNodes[5].style.height = '7px';
+      // 詳細or概要がない場合
       } else {
         tweetDivtag.childNodes[3].style.height = '7px';
         tweetDivtag.childNodes[3].style.marginTop = '-7px';
       }
     }
 
-    // フォローの繋がりの部分を消去
-    $("div[class='ScrollBump ScrollBump--recentlyFollowed']").remove();
-    // リンクは必ず新しいタブに飛ばす
-    $("a[class='twitter-timeline-link']").attr("target", "_blank");
+    $("div[class='ScrollBump ScrollBump--recentlyFollowed']").remove(); // フォローの繋がりの部分を消去
+    $("a[class='twitter-timeline-link']").attr("target", "_blank"); // リンクは必ず新しいタブに飛ばす
     // 元のURLでジャンプさせる
     var link = document.querySelectorAll("a[class='twitter-timeline-link']");
     for (var i = 0; i < link.length; i++) {
-      if(link[i].getAttribute("data-pre-embedded")) { // pic.twitter.com
+      // pic.twitter.com
+      if(link[i].getAttribute("data-pre-embedded")) {
         link[i].href = "http://" + link[i].childNodes[0].nodeValue;
-      } else if(link[i].getAttribute("title")) { // pic.twitter.com以外のリンク
+      // pic.twitter.com以外のリンク
+      } else if(link[i].getAttribute("title")) {
         link[i].href = link[i].getAttribute("title");
       }
     }
