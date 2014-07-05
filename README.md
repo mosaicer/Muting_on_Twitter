@@ -1,8 +1,8 @@
 How to use (使い方)
 ===================
-1. Install [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) on Firefox / [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) on Chrome
-2. Visit [Raw page of this user script](https://raw.githubusercontent.com/mosaicer/Muting_on_Twitter/master/Muting_on_Twitter.user.js)
-3. Install this user script
+1. Install Greasemonkey([en-US](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) / [ja](https://addons.mozilla.org/ja/firefox/addon/greasemonkey/)) on Firefox / [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) on Chrome.
+2. Visit [Raw page of this user script](https://raw.githubusercontent.com/mosaicer/Muting_on_Twitter/master/Muting_on_Twitter.user.js).
+3. Install this user script.
 4. Enjoy your Twitter Life!
 
 Features (機能)
