@@ -42,4 +42,4 @@ __version 3.0 is very different from previous version, so reinstalling may be be
 
 Screenshot (スクリーンショット)
 ===============================
-![Chrome+Tampermonkeyで動かしたときのスクリーンショット](https://pbs.twimg.com/media/BufSQXlCQAIB739.png:large "Chrome+Tampermonkeyで動かしたときのスクリーンショット")
+![Chrome+Tampermonkeyで動かしたときのスクリーンショット](https://pbs.twimg.com/media/BugQRgKCYAAk4Y0.png "Chrome+Tampermonkeyで動かしたときのスクリーンショット")
