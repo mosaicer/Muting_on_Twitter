@@ -38,4 +38,8 @@ __また、ツイートのスタイルを変更します。__
 
 Notes (備考)
 =============
-__version 3.0 is very defferent from previous version, so reinstalling may be better than updating.__
+__version 3.0 is very different from previous version, so reinstalling may be better than updating.__
+
+Screenshot (スクリーンショット)
+===============================
+![Chrome+Tampermonkeyで動かしたときのスクリーンショット](https://pbs.twimg.com/media/BufSQXlCQAIB739.png:large "Chrome+Tampermonkeyで動かしたときのスクリーンショット")
