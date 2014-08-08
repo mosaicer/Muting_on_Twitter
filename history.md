@@ -1,3 +1,7 @@
+* version 3.1
+  - improve buttons of header
+    + move a button of form to the top of user's information
+    + delete a button to jump at the top of page
 * __version 3.0__
   - __be faster not to use "require"__
   - __enable to mute tweets for userIDs__
