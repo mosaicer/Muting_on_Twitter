@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Muting texts/links/tags on "Twitter Web Client" and changing tweets' style
-// @version     3.0
+// @version     3.1
 // @include     https://twitter.com/
 // @grant       GM_registerMenuCommand
 // @grant       GM_getValue
@@ -43,17 +43,11 @@
       HeaderStruct = function() {
         this.contentHeader = document.querySelector(".content-header");
         this.headerInner = document.querySelector(".header-inner");
-        this.btbParentNode = document.querySelector(".container");
         this.openClose_msg = {
-          ja: "▼フォーム欄の開閉 ",
-          en: "▼Open/Close input form "
+          ja: "▶ フォーム欄の開閉 ◀",
+          en: "▶ Open/Close input form ◀"
         };
-        this.openClose_btn = document.createElement("span");
-        this.pageTop_msg = {
-          ja: "▲ページの先頭へ",
-          en: "▲Jump at the top of page"
-        };
-        this.pageTop_btn = document.createElement("span");
+        this.openClose_btn = document.createElement("div");
         this.btnAry = {
           ja: ["追加", "削除", "確認"],
           en: ["Add", "Del", "Confirm"]
@@ -227,18 +221,18 @@
     this.contentHeader.style.borderStyle = "hidden";
     this.headerInner.style.height = "120px";
     this.headerInner.style.backgroundColor = "transparent";
-    // ページの先頭へジャンプできるボタンを置く
-    this.pageTop_btn.setAttribute("id", "move_top");
-    this.pageTop_btn.style.color = "blue";
-    this.pageTop_btn.style.cursor = "pointer";
-    this.pageTop_btn.appendChild(document.createTextNode(this.pageTop_msg[setting.userLang]));
-    this.btbParentNode.insertBefore(this.pageTop_btn, document.querySelector("[role='navigation']"));
-    // ページのヘッダーのツイッターアイコンの横にフォーム欄の開閉を操作できるボタンを置く
+    // フォーム欄の開閉を操作できるボタンを置く
     this.openClose_btn.setAttribute("id", "open_close");
-    this.openClose_btn.style.color = "red";
+    this.openClose_btn.style.backgroundColor = "#FFD700";
     this.openClose_btn.style.cursor = "pointer";
+    this.openClose_btn.style.width = "290px";
+    this.openClose_btn.style.textAlign = "center";
+    this.openClose_btn.style.marginBottom = "15px";
     this.openClose_btn.appendChild(document.createTextNode(this.openClose_msg[setting.userLang]));
-    this.btbParentNode.insertBefore(this.openClose_btn, document.getElementById("move_top"));
+    document.querySelector("[class='dashboard dashboard-left ']").insertBefore(
+      this.openClose_btn,
+      document.querySelector("[class='DashboardProfileCard  module']")
+    );
     // 各テキストボックスとボタンを設置
     document.getElementById("content-main-heading").innerHTML = "<form onsubmit='return false;'>" +
         "<input type='text' id='mTextForm' class='form_btn' value='' placeholder='" +
@@ -288,14 +282,6 @@
           header.contentHeader.style.display = "block"; // 開く
           GM_setValue("form_flag", true);
         }
-      },
-      false
-    );
-    // ページの先頭へジャンプする
-    document.getElementById("move_top").addEventListener(
-      "click",
-      function() {
-        window.scroll(0, 0);
       },
       false
     );
