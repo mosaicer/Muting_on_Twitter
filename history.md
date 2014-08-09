@@ -1,3 +1,7 @@
+* __version 4.0__
+  - __include "https://twitter.com/search?*"__
+    + _it has instability_; that is written at Issues.
+  - improve input form
 * version 3.1
   - improve buttons of header
     + move a button of form to the top of user's information
