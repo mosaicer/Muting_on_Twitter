@@ -8,32 +8,28 @@ How to use (使い方)
 Features (機能)
 ===============
 __This user script enables to mute texts/links/tags/userIDs on "Twitter Web Client".__
-* __This user script works on "Search page".__
-  - some notes are written on issues.
-  - __when this user script correctly doesn't work, please report the details.__
+* __This user script also works on "Search page".__
 * This user script decides a language from a language of your browser.
-  - when Japanese is used, please check a language of your browser.
+  - when Japanese is used, please confirm a language of your browser.
 * __You can add/delete plural letters.__
-  - please divide them by the letter "__,/__". (Ex: Firefox,/Chrome)
+  - please divide them by the letter `,/`. (Ex: Firefox`,/`Chrome)
 * Some user script commands are prepared.
   - you can choose necessary features for you.
 
-__This user script change tweets' style.__
-* remove promoted tweets.
-* username and userID turn red.
-* time turn blue.
+__This user script changes tweets' style.__
+* promoted tweets are removed.
+* letters which represent username and userID turn red.
+* letters which represent time turn blue.
 * texts(contents) of tweets are emphasized.
 
 ----------------------------------------------------------------------------------
 
 __このユーザースクリプトは、テキスト/リンク/タグ/ユーザーIDをミュートすることができます。__
 * __検索ページでもホームのページと同じようにミュートできます。__
-  - issuesに備考的なものを書いたので何かあればご覧ください。
-  - _正しく機能しない場合は報告していただけるとありがたいです。_
 * 使っているブラウザの言語から日本語か英語のどちらを使うかを判断します。
   - 日本語にならない場合はブラウザの言語設定をご確認ください。
 * __複数の文字をミュートリストに追加/削除することができます。__
-  - ミュートしたい文字を__,/__で区切って入力してください。 (例：Firefox,/Chrome)
+  - ミュートしたい文字を`,/`で区切って入力してください。 (例：Firefox`,/`Chrome)
 * いくつかのユーザースクリプトコマンドメニューが用意されています。
   - 必要な機能だけを選んで使うことができます。
 
@@ -44,7 +40,9 @@ __また、ツイートのスタイルを変更します。__
 
 Notes (備考)
 =============
-__version 3.0 is very different from previous version, so reinstalling may be better than updating.__
+* __This user script correctly doesn't work on "Search page".__
+  - The details are written on Issues.
+  - _When you find bugs, please report them._
 
 Screenshot (スクリーンショット)
 ===============================
