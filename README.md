@@ -22,6 +22,8 @@ __This user script changes tweets' style.__
 * letters which represent time turn blue.
 * texts(contents) of tweets are emphasized.
 
+![Firefox+Greasemonekyで動かしたときのスクリーンショット](https://pbs.twimg.com/media/Bu5LfixCYAARgMf.png:large "Firefox+Greasemonekyで動かしたときのスクリーンショット")
+
 ----------------------------------------------------------------------------------
 
 __このユーザースクリプトは、テキスト/リンク/タグ/ユーザーIDをミュートすることができます。__
@@ -38,12 +40,10 @@ __また、ツイートのスタイルを変更します。__
 * ユーザーネーム・ユーザーIDは赤く、時間は青くします。
 * ツイート本文は太字になります。
 
+![Chrome+Tampermonkeyで動かしたときのスクリーンショット](https://pbs.twimg.com/media/BumeJsXCYAAlN7c.png:large "Chrome+Tampermonkeyで動かしたときのスクリーンショット")
+
 Notes (備考)
 =============
-* __This user script correctly doesn't work on "Search page".__
-  - The details are written on Issues.
+* __This user script is instable on "Search page".__
+  - The details are described on Issues.
   - _When you find bugs, please report them._
-
-Screenshot (スクリーンショット)
-===============================
-![Chrome+Tampermonkeyで動かしたときのスクリーンショット](https://pbs.twimg.com/media/BumeJsXCYAAlN7c.png:large "Chrome+Tampermonkeyで動かしたときのスクリーンショット")
