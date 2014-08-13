@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name        Muting+α on Twitter
+// @name        Muting on Twitter
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
-// @description Muting texts/links/tags/userIDs on "Twitter Web Client" and changing tweets' style
-// @version     4.0
+// @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
+// @version     4.1
 // @include     https://twitter.com/
 // @include     https://twitter.com/search?*
 // @grant       GM_getValue
@@ -13,22 +13,18 @@
 (function () {
   var Init = function() {
         this.menu_jp = {
-          // オブジェクトは、キー:フラグ名+"Change",値:メニューの関数
           mute_text_flag: ["ツイート本文についてのミュートを", {}],
           mute_link_flag: ["リンクについてのミュートを", {}],
           mute_tag_flag: ["ハッシュタグについてのミュートを", {}],
           mute_userId_flag: ["ユーザーIDについてのミュートを", {}],
           style_flag: ["各ツイートの装飾を", {}]
-          // lang_flag: ["英語に切り替える", {}]
         };
         this.menu_en = {
-          // オブジェクトは、キー:フラグ名+"Change",値:メニューの関数
           mute_text_flag: [" mute for texts in tweet", {}],
           mute_link_flag: [" mute for links in tweet", {}],
           mute_tag_flag: [" mute for hashtags in tweet", {}],
           mute_userId_flag: [" mute for userIDs in tweet", {}],
           style_flag: [" changing tweet style", {}]
-          // lang_flag: ["Change the language you're using to Japanese", {}]
         };
         this.msgFlag = false;
         this.msg = "";
@@ -88,17 +84,15 @@
         this.muteListTemp = "";
         this.altMsgAry = {
           ja: [
-                "ミュートしたい文字列はすでに設定されています",
-                "ミュートしたい文字列は削除できません",
-                "ミュートしたい文字列は設定した文字列とマッチしませんでした",
+                "' はすでに設定されています",
+                "' は設定した文字列とマッチしませんでした",
                 "↓ミュートする文字列をカンマ区切りで表示しています↓\n\n",
                 "ミュートする文字列が設定されていません",
                 "申し訳ないですが、ミュートする文字列に,/は使うことができません"
               ],
           en: [
-                "The word is already set for mute word",
-                "The word can not be deleted",
-                "The word is not set for mute word",
+                "' is already set for mute word",
+                "' is not set for mute word",
                 "↓The mute words separated by conmma↓\n\n",
                 "The mute words are not found",
                 "Sorry, the mute words which contains the word ',/' can not be set"
@@ -108,11 +102,11 @@
       buttonAction,
       MuteFeatures = function() {
         this.homeTweets = "";
-        this.replyPrnt = ""; // リプライツイートの親要素
+        this.replyPrnt = ""; // parent nodes of tweets of reply
         this.flag = "";
         this.i = 0;
         this.j = 0;
-        // 要素を判断する時に参照する
+        // use when judging elements
         this.tweetPrnt = "";
         this.tweetElement = "";
       },
@@ -120,9 +114,9 @@
       key = "",
       pageURL = location.href,
       userLang = window.navigator.language === "ja" ? "ja" : "en",
-      // 各ツイートを装飾する、コンストラクタではない
+      // decorate all tweets, not constructer
       tweetStyleChange = function() {
-        // ツイートの文字を太字に
+        // make font-weight of tweets' letters bold
         if (pageURL === "https://twitter.com/") {
           Array.prototype.slice.call(document.querySelectorAll("[class='js-tweet-text tweet-text']")).forEach(
             function (targetNode) {
@@ -130,80 +124,53 @@
             }
           );
         }
-        // ユーザー名を赤く
+        // make color of tweets' usernames and userIDs red
         Array.prototype.slice.call(document.querySelectorAll("[class*='js-action-profile-name']")).forEach(
           function (targetNode) {
             targetNode.style.color = "red";
           }
         );
-        // 時間経過を青く
+        // make color of tweets' time blue
         Array.prototype.slice.call(document.querySelectorAll("[data-long-form='true']")).forEach(
           function (targetNode) {
             targetNode.style.color = "blue";
           }
         );
-        // リンクは必ず新しいタブに飛ばす
         Array.prototype.slice.call(document.querySelectorAll("[class='twitter-timeline-link']")).forEach(
           function (targetNode) {
             targetNode.setAttribute("target", "_blank");
           }
         );
       },
-      // MutationObserver用
+      // MutationObserver
       MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver,
       observer;
 
   Init.prototype = {
-    // アクセス時の処理
     accessSet: function() {
-      // if (GM_getValue("lang_flag") === true) {
       if (userLang === "ja") {
         for (key in this.menu_jp) {
           if (this.menu_jp.hasOwnProperty(key)) {
-            // 初アクセス時のみに実行、フラグの設定
+            // set each flags, once after installing this user script
             if (typeof GM_getValue(key) === "undefined") {
-              // if (key !== "lang_flag") { // 引用符必要?
-                GM_setValue(key, true);
-              // } else {
-              //   if (window.navigator.language === "ja") {
-              //     GM_setValue(key, true);
-              //   } else {
-              //     GM_setValue(key, false);
-              //   }
-              // }
+              GM_setValue(key, true);
             }
-            // ユーザースクリプトコマンドメニューを構成
-            // if (key !== "lang_flag") { // 引用符必要?
-              this.msgFlag = GM_getValue(key) === true ? "無効" : "有効";
-              this.msg = this.menu_jp[key][0] + this.msgFlag + "にする";
-            // } else {
-            //   this.msg = this.menu_jp[key][0];
-            // }
+            // construct command menus
+            this.msgFlag = GM_getValue(key) === true ? "無効" : "有効";
+            this.msg = this.menu_jp[key][0] + this.msgFlag + "にする";
             GM_registerMenuCommand(this.msg, this.featuresChg.bind(this.menu_jp[key][1][key + "Change"], key));
           }
         }
       } else {
         for (key in this.menu_en) {
           if (this.menu_jp.hasOwnProperty(key)) {
-            // 初アクセス時のみに実行、フラグの設定
+            // set each flags, once after installing this user script
             if (typeof GM_getValue(key) === "undefined") {
-              // if (key !== "lang_flag") { // 引用符必要?
-                GM_setValue(key, true);
-              // } else {
-              //   if (window.navigator.language === "ja") {
-              //     GM_setValue(key, true);
-              //   } else {
-              //     GM_setValue(key, false);
-              //   }
-              // }
+              GM_setValue(key, true);
             }
-            // ユーザースクリプトコマンドメニューを構成
-            // if (key !== "lang_flag") { // 引用符必要?
-              this.msgFlag = GM_getValue(key) === true ? "Disable" : "Enable";
-              this.msg = this.msgFlag + this.menu_en[key][0];
-            // } else {
-            //   this.msg = this.menu_en[key][0];
-            // }
+            // construct command menus
+            this.msgFlag = GM_getValue(key) === true ? "Disable" : "Enable";
+            this.msg = this.msgFlag + this.menu_en[key][0];
             GM_registerMenuCommand(this.msg, this.featuresChg.bind(this.menu_en[key][1][key + "Change"], key));
           }
         }
@@ -224,7 +191,7 @@
         GM_setValue("style_flag", true);
       }
     },
-    // ユーザースクリプトコマンドメニューで実行する関数、有効/無効の切り替え
+    // the function of command menus, make available or unavailable
     featuresChg: function(flagName) {
       this.msgFlag = GM_getValue(flagName) === true ? false : true;
       GM_setValue(flagName, this.msgFlag);
@@ -233,13 +200,13 @@
   };
 
   HeaderStruct.prototype.styleSet = function () {
-    // ヘッダーのスタイルを変更する
+    // change a header's style
     if (pageURL === "https://twitter.com/") {
       this.contentHeader.style.borderStyle = "hidden";
       this.headerInner.style.height = "65px";
       this.headerInner.style.backgroundColor = "transparent";
     }
-    // フォーム欄の開閉を操作できるボタンを置く
+    // set a button that shows/hides input form
     this.openClose_btn.setAttribute("id", "open_close");
     this.openClose_btn.style.backgroundColor = "#FFD700";
     this.openClose_btn.style.cursor = "pointer";
@@ -247,14 +214,14 @@
     this.openClose_btn.style.textAlign = "center";
     this.openClose_btn.style.marginBottom = "15px";
     this.openClose_btn.appendChild(document.createTextNode(this.openClose_msg[userLang]));
-    this.parentFormNode.insertBefore(this.openClose_btn, this.previousNode); // 検索とホームで別のノードを参照する必要がある
-    // 各テキストボックスとボタンを設置
+    this.parentFormNode.insertBefore(this.openClose_btn, this.previousNode);
+    // construct a container of input form
     this.formContainer = "<form onsubmit='return false;'>" +
           "<input type='text' id='mLtrForm' class='form_btn' value='' placeholder='" +
           this.placeholderAry[userLang][0] + "' style='width: " + this.headerWidth + "px;'>" +
           "<input type='button' id='mLtrAdd' class='form_btn' value='" + this.btnAry[userLang][0] + "'>" +
           "<input type='button' id='mLtrRmv' class='form_btn' value='" + this.btnAry[userLang][1] + "'>" +
-          "<input type='button' id='mLtrConf' value='" + this.btnAry[userLang][2] + "' style='float:right; color:black;'>" +
+          "<input type='button' id='mLtrConf' value='" + this.btnAry[userLang][2] + "' style='color:black;'>" +
           "</form><div style='background-color:white; margin-top:8px; font-size:12px; color:black; height:23px;'>" +
           "<span style='color:green;'>" + this.placeholderAry[userLang][5] + "：　</span>" +
           "<label style='margin-right: 17px;'><input type='radio' name='muteLetter' value='mute_words' checked>" +
@@ -275,12 +242,11 @@
     }
     Array.prototype.slice.call(document.querySelectorAll(".form_btn")).forEach(
       function (targetNode) {
-        targetNode.setAttribute("float", "left");
         targetNode.style.marginRight = "10px";
         targetNode.style.color = "black";
       }
     );
-    // フォーム欄のフラグをチェック
+    // check the flag of input form
     if (GM_getValue("form_flag") === false) {
       if (pageURL === "https://twitter.com/") {
         this.contentHeader.style.display = "none";
@@ -291,7 +257,7 @@
   };
 
   ButtonSet.prototype = {
-    // ミュートする文字列を追加する
+    // add letters to a mute list
     addMuteLtr: function (btn_flag, theLetter) {
       this.btnFlag = btn_flag;
       this.pluralFlag = 0;
@@ -318,16 +284,14 @@
             location.href = pageURL;
           }
         } else {
-          alert(this.altMsgAry[userLang][5]);
+          alert(this.altMsgAry[userLang][4]);
         }
       }
     },
     addFunc: function (targetLtr) {
       this.targetText = targetLtr;
       this.muteFlag = 0;
-      // 未入力の場合ではない時
       if (this.targetText !== "") {
-        // 初めてor空に、追加する時
         if (typeof GM_getValue(this.btnFlag) === "undefined" || setting.muteNameArray[this.btnFlag][0] === "") {
           if (this.pluralFlag === 1) {
             this.muteListTemp.push(this.targetText);
@@ -335,7 +299,6 @@
             this.muteListTemp = this.targetText;
           }
         }
-        // すでに入ってる状態の時
         else {
           setting.muteNameArray[this.btnFlag].forEach(this.completeComp, buttonAction);
           if (this.muteFlag === 0) {
@@ -345,12 +308,12 @@
               this.muteListTemp = setting.muteNameArray[this.btnFlag].join(",/") + ",/" + this.targetText;
             }
           } else {
-            alert(this.altMsgAry[userLang][0]);
+            alert("'" + this.targetText + this.altMsgAry[userLang][0]);
           }
         }
       }
     },
-    // ミュートする文字列を削除する
+    // delete letters from a mute list
     delMuteLtr: function (btn_flag, theLetter) {
       this.btnFlag = btn_flag;
       this.muteListTemp = setting.muteNameArray[btn_flag];
@@ -366,39 +329,34 @@
             location.href = pageURL;
           }
         } else {
-          alert(this.altMsgAry[userLang][5]);
+          alert(this.altMsgAry[userLang][4]);
         }
       }
     },
     deleteFunc: function (targetLtr) {
       this.targetText = targetLtr;
       this.muteFlag = 0;
-      // 未入力ではない時
       if (this.targetText !== "") {
-        // 文字列が入ってない時
         if (typeof GM_getValue(this.btnFlag) === "undefined" || this.muteListTemp[0] === "") {
-          alert(this.altMsgAry[userLang][1]);
+          alert(this.altMsgAry[userLang][3]);
         }
-        // 文字列がセットされている時
         else {
           this.muteListTemp.forEach(this.completeComp, buttonAction);
           if (this.muteFlag === 1) {
             this.muteListTemp = this.muteListTemp.filter(this.filterFunc, buttonAction);
           } else {
-            alert(this.altMsgAry[userLang][2]);
+            alert("'" + this.targetText + this.altMsgAry[userLang][1]);
           }
         }
       }
     },
-    // ミュートする文字列を確認する
+    // confirm a mute list
     confMuteLtr: function (btn_flag) {
-      // ミュートする文字列が設定されていた時
       if (typeof GM_getValue(btn_flag) !== "undefined" && setting.muteNameArray[btn_flag][0] !== "") {
-        alert(this.altMsgAry[userLang][3] + setting.muteNameArray[btn_flag]);
+        alert(this.altMsgAry[userLang][2] + setting.muteNameArray[btn_flag]);
       }
-      // ミュートする文字列が設定されていなかった時
       else {
-        alert(this.altMsgAry[userLang][4]);
+        alert(this.altMsgAry[userLang][3]);
       }
     },
     completeComp: function (targetLtr) {
@@ -412,57 +370,50 @@
   };
 
   MuteFeatures.prototype = {
-    // ミュート機能を始動
     muteTweet: function (addedTweets) {
-      // プロモーションを消去
+      // remove promoted tweet
       if (document.querySelector("[data-promoted='true']") !== null) {
         document.querySelector("[data-promoted='true']").parentNode.style.display = "none";
       }
-      // 人と繋がるバナーを消去
-      // if (document.querySelector("[class='promptbird promptbird-below-black-bar']") !== null) {
-      //   document.querySelector("[class='promptbird promptbird-below-black-bar']").style.display = "none";
-      // }
+      // remove a banner of header
+      if (document.querySelector("[class='promptbird promptbird-below-black-bar']") !== null) {
+        document.querySelector("[class='promptbird promptbird-below-black-bar']").style.display = "none";
+      }
 
-      // ノードが追加された時
+      // when nodes are added
       if (typeof addedTweets !== "undefined") {
         this.homeTweets = Array.prototype.slice.call(addedTweets);
       }
-      // ノードが追加されなかった時
+      // when nodes are not added
       else {
         this.homeTweets = Array.prototype.slice.call(document.querySelectorAll("[data-item-type]"));
       }
       this.homeTweets.forEach(this.nodeCheck, muteAction);
     },
-    // ツイートが返信かどうかなどの判断
     nodeCheck: function (targetNode) {
       var tweetPtag;
       if (targetNode.hasAttribute("data-item-type")) {
         this.tweetPrnt = targetNode;
-        // <LI>タグ内が空ではない時
         if (typeof this.tweetPrnt.childNodes[1].childNodes[3] !== "undefined") {
           tweetPtag = this.tweetPrnt.childNodes[1].childNodes[3].childNodes[3];
         }
-        // 返信のツイートである時
+        // reply
         if (typeof tweetPtag === "undefined") {
-          // ホームの場合
           if (pageURL === "https://twitter.com/") {
-            // 要素がある場合
             for (this.i = 3; typeof this.tweetPrnt.childNodes[1].childNodes[this.i] !== "undefined"; this.i++) {
               this.replyPrnt = this.tweetPrnt.childNodes[1].childNodes[this.i];
               if (
                 typeof this.replyPrnt.childNodes[1] !== "undefined" &&
                 this.replyPrnt.childNodes[1].getAttribute("data-you-block")
               ) {
-                this.tweetPrnt = this.replyPrnt; // リプライを消すときに参照する親ノードを変更
+                this.tweetPrnt = this.replyPrnt;
                 tweetPtag = this.replyPrnt.childNodes[1].childNodes[3].childNodes[3];
                 this.tweetElmCheck(tweetPtag);
-                this.tweetPrnt = targetNode; // 値を元に戻す
+                this.tweetPrnt = targetNode;
               }
             }
           }
-          // 検索ページの時、返信は無いため気にする必要はなくこのイレギュラーなツイートのみを判断する
           else {
-            // すべてのトップで余計なノードを通さない
             if (
               this.tweetPrnt.childNodes[1].className !== "account-group js-account-group js-user-profile-link" &&
               this.tweetPrnt.childNodes[1].className !== "avatar size32 js-user-profile-link"
@@ -472,9 +423,9 @@
             }
           }
         }
-        // 返信ではない場合
+        // not reply
         else {
-          // タイムライン検索の時
+          // on Search page, timeline
           if (tweetPtag.className === "fullname js-action-profile-name show-popup-with-id") {
             tweetPtag = this.tweetPrnt.childNodes[1].childNodes[5];
           }
@@ -482,66 +433,62 @@
         }
       }
     },
-    // ツイート内の要素を判断
     tweetElmCheck: function(twtPtag) {
-      // <P>タグのthis.j番目の要素がある場合
       for (this.j = 0; typeof twtPtag.childNodes[this.j] !== "undefined"; this.j++) {
         this.tweetElement = twtPtag.childNodes[this.j];
-        // <A>タグの時
+        // <A> tag
         if (this.tweetElement.nodeName === "A") {
-          // pic.twitter.com
+          // "pic.twitter.com"
           if (this.tweetElement.getAttribute("data-pre-embedded")) {
-            this.tweetElement.href = "http://" + this.tweetElement.childNodes[0].nodeValue; // 元のURLでジャンプさせる
+            this.tweetElement.href = "http://" + this.tweetElement.childNodes[0].nodeValue;
             this.muteLtrCheck("mute_links");
           }
-          // pic.twitter.com以外のリンク
+          // not "pic.twitter.com"
           else if (this.tweetElement.getAttribute("title")) {
             this.tweetElement.href = this.tweetElement.getAttribute("title");
             this.muteLtrCheck("mute_links");
           }
-          // ハッシュタグ
+          // hashtags
           else if (this.tweetElement.getAttribute("data-query-source")) {
             this.muteLtrCheck("mute_tags");
           }
-          // ユーザーID
+          // userIDs
           else if (this.tweetElement.childNodes[0].childNodes[0].nodeValue === "@") {
             this.muteLtrCheck("mute_ids");
           }
         }
-        // テキストか<STRONG>タグの時
+        // text or <STRONG> tag
         else if (this.tweetElement.nodeName === "#text" || this.tweetElement.nodeName === "STRONG") {
           this.muteLtrCheck("mute_words");
         }
       }
     },
-    // ミュートする文字を決定する
     muteLtrCheck: function (mute_flag) {
       if (typeof GM_getValue(mute_flag) !== "undefined" && setting.muteNameArray[mute_flag][0] !== "") {
         this.flag = mute_flag;
         setting.muteNameArray[mute_flag].forEach(this.muteFunc, muteAction);
       }
     },
-    // ツイートの各対象についてミュートする
     muteFunc: function (targetLtr) {
       var nodeValTemp = "";
       switch (this.flag) {
         case "mute_words":
           if (GM_getValue("mute_text_flag") === true) {
-            // テキスト
+            // text
             if (this.tweetElement.nodeName === "#text") {
               if (this.tweetElement.nodeValue.indexOf(targetLtr) >= 0) {
                 this.tweetPrnt.style.display = "none";
               }
             }
-            // <STRONG>タグ
+            // <STRONG> tag
             else {
-              // 前のテキストノードがあれば加える
+              // add the previous text if it exists
               if (this.tweetElement.previousSibling !== null && this.tweetElement.previousSibling.nodeName === "#text") {
                 nodeValTemp = this.tweetElement.previousSibling.nodeValue;
               }
-              // <STRONG>タグ内のテキストを取得
+              // text of <STRONG> tag
               nodeValTemp += this.tweetElement.childNodes[0].nodeValue;
-              // 後ろのテキストノードがあれば加える
+              // add the next text if it exists
               if (this.tweetElement.nextSibling !== null && this.tweetElement.nextSibling.nodeName === "#text") {
                 nodeValTemp += this.tweetElement.nextSibling.nodeValue;
               }
@@ -553,13 +500,13 @@
           break;
         case "mute_links":
           if (GM_getValue("mute_link_flag") === true) {
-            // pic.twitter.com以外のリンク
+            // not "pic.twitter.com"
             if (this.tweetElement.getAttribute("title")) {
               if (this.tweetElement.getAttribute("title").indexOf(targetLtr) >= 0) {
                 this.tweetPrnt.style.display = "none";
               }
             }
-            // pic.twitter.com
+            // "pic.twitter.com"
             else if (this.tweetElement.innerHTML.replace(/<strong>|<\/strong>/g, "").indexOf(targetLtr) >= 0) {
               this.tweetPrnt.style.display = "none";
             }
@@ -585,25 +532,24 @@
     }
   };
 
-  // インスタンス化
   setting = new Init();
   header = new HeaderStruct();
   buttonAction = new ButtonSet();
   muteAction = new MuteFeatures();
 
-  setting.accessSet(); // DBの初期設定、メニューの構築、ミュートリストの取得
-  header.styleSet(); // ヘッダー部分の構築
-  muteAction.muteTweet(); // ツイートのミュート処理
+  setting.accessSet();
+  header.styleSet();
+  muteAction.muteTweet();
 
   if (GM_getValue("style_flag") === true) {
-    tweetStyleChange(); // ツイートの装飾
+    tweetStyleChange();
   }
 
-  // ボタンイベント---------------------------------------------------------------------------------------------
+  // events of all buttons------------------------------------------------------------------
   document.addEventListener("click", function (e) {
-    var tgtNode = e.target; // クリックしたノード
+    var tgtNode = e.target; // nodes clicked
     switch (tgtNode.id) {
-      // フォーム欄の開閉
+      // input form
       case "open_close":
         if (GM_getValue("form_flag") === true) {
           if (pageURL === "https://twitter.com/") {
@@ -621,22 +567,20 @@
           GM_setValue("form_flag", true);
         }
         break;
-      // ミュートする文字列の追加
       case "mLtrAdd":
         buttonAction.addMuteLtr(document.querySelector("[checked]").value, document.getElementById("mLtrForm").value);
         break;
-      // ミュートする文字列の削除
       case "mLtrRmv":
         buttonAction.delMuteLtr(document.querySelector("[checked]").value, document.getElementById("mLtrForm").value);
         break;
-      // ミュートする文字列の確認
       case "mLtrConf":
         buttonAction.confMuteLtr(document.querySelector("[checked]").value);
         break;
       default:
-        // どれに対してミュートするかラジオボタンにチェック
+        // radio buttons
         if (tgtNode.name === "muteLetter") {
-          if (document.querySelector("[checked]")) { // 2つ以上付かないように前のチェックを消去
+          // check must be unique
+          if (document.querySelector("[checked]")) {
             document.querySelector("[checked]").removeAttribute("checked");
           }
           tgtNode.setAttribute("checked", "checked");
@@ -644,15 +588,14 @@
         break;
     }
   }, false);
-  // 追加のページの読み込みを監視して実行-----------------------------------------------------------------------
+  // MutationObserver-----------------------------------------------------------------------
   observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
       if (GM_getValue("style_flag") === true) {
         tweetStyleChange();
       }
-      // 空じゃない時
       if (mutation.addedNodes.length !== 0) {
-        muteAction.muteTweet(mutation.addedNodes); // 追加されたノードを渡す
+        muteAction.muteTweet(mutation.addedNodes);
       }
     });
   });
