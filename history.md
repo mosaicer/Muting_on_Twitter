@@ -1,3 +1,6 @@
+* version 4.2
+  - fix disposal of the tag `STRONG`
+  - prohibit inputing the letter `,/` 
 * version 4.1
   - fix all comments
   - fix some alert messages
