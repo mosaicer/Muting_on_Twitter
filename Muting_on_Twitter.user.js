@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     4.1
+// @version     4.2
 // @include     https://twitter.com/
 // @include     https://twitter.com/search?*
 // @grant       GM_getValue
@@ -114,6 +114,10 @@
       key = "",
       pageURL = location.href,
       userLang = window.navigator.language === "ja" ? "ja" : "en",
+      splitWord = ",/",
+      // MutationObserver
+      MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver,
+      observer,
       // decorate all tweets, not constructer
       tweetStyleChange = function() {
         // make font-weight of tweets' letters bold
@@ -141,10 +145,7 @@
             targetNode.setAttribute("target", "_blank");
           }
         );
-      },
-      // MutationObserver
-      MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver,
-      observer;
+      };
 
   Init.prototype = {
     accessSet: function() {
@@ -177,8 +178,8 @@
       }
       for (key in this.muteNameArray) {
         if (this.muteNameArray.hasOwnProperty(key) && typeof GM_getValue(key) !== "undefined") {
-          if (GM_getValue(key).indexOf(",/") >= 0) {
-            this.muteNameArray[key] = GM_getValue(key).split(",/");
+          if (GM_getValue(key).indexOf(splitWord) >= 0) {
+            this.muteNameArray[key] = GM_getValue(key).split(splitWord);
           } else {
             this.muteNameArray[key].push(GM_getValue(key));
           }
@@ -262,11 +263,11 @@
       this.btnFlag = btn_flag;
       this.pluralFlag = 0;
       if (theLetter !== "") {
-        if (theLetter.indexOf(",/,/") < 0) {
-          if (theLetter.indexOf(",/") >= 0) {
+        if (theLetter.indexOf(splitWord + splitWord) < 0 && theLetter !== splitWord) {
+          if (theLetter.indexOf(splitWord) >= 0) {
             this.pluralFlag = 1;
             this.muteListTemp = [];
-            theLetter.split(",/").forEach(this.addFunc, buttonAction);
+            theLetter.split(splitWord).forEach(this.addFunc, buttonAction);
           } else {
             this.muteListTemp = "";
             this.addFunc(theLetter);
@@ -276,9 +277,9 @@
               GM_setValue(btn_flag, this.muteListTemp);
             } else {
               if (typeof GM_getValue(btn_flag) === "undefined" || setting.muteNameArray[btn_flag][0] === "") {
-                GM_setValue(btn_flag, this.muteListTemp.join(",/"));
+                GM_setValue(btn_flag, this.muteListTemp.join(splitWord));
               } else {
-                GM_setValue(btn_flag, setting.muteNameArray[btn_flag].join(",/") + ",/" + this.muteListTemp.join(",/"));
+                GM_setValue(btn_flag, setting.muteNameArray[btn_flag].join(splitWord) + splitWord + this.muteListTemp.join(splitWord));
               }
             }
             location.href = pageURL;
@@ -305,7 +306,7 @@
             if (this.pluralFlag === 1) {
               this.muteListTemp.push(this.targetText);
             } else {
-              this.muteListTemp = setting.muteNameArray[this.btnFlag].join(",/") + ",/" + this.targetText;
+              this.muteListTemp = setting.muteNameArray[this.btnFlag].join(splitWord) + splitWord + this.targetText;
             }
           } else {
             alert("'" + this.targetText + this.altMsgAry[userLang][0]);
@@ -318,14 +319,14 @@
       this.btnFlag = btn_flag;
       this.muteListTemp = setting.muteNameArray[btn_flag];
       if (theLetter !== "") {
-        if (theLetter.indexOf(",/,/") < 0) {
-          if (theLetter.indexOf(",/") >= 0) {
-            theLetter.split(",/").forEach(this.deleteFunc, buttonAction);
+        if (theLetter.indexOf(splitWord + splitWord) < 0 && theLetter !== splitWord) {
+          if (theLetter.indexOf(splitWord) >= 0) {
+            theLetter.split(splitWord).forEach(this.deleteFunc, buttonAction);
           } else {
             this.deleteFunc(theLetter);
           }
           if (this.muteListTemp !== setting.muteNameArray[btn_flag]) {
-            GM_setValue(this.btnFlag, this.muteListTemp.join(",/"));
+            GM_setValue(this.btnFlag, this.muteListTemp.join(splitWord));
             location.href = pageURL;
           }
         } else {
@@ -439,17 +440,17 @@
         // <A> tag
         if (this.tweetElement.nodeName === "A") {
           // "pic.twitter.com"
-          if (this.tweetElement.getAttribute("data-pre-embedded")) {
-            this.tweetElement.href = "http://" + this.tweetElement.childNodes[0].nodeValue;
+          if (this.tweetElement.hasAttribute("data-pre-embedded")) {
+            this.tweetElement.setAttribute("href", "http://" + this.tweetElement.childNodes[0].nodeValue);
             this.muteLtrCheck("mute_links");
           }
           // not "pic.twitter.com"
-          else if (this.tweetElement.getAttribute("title")) {
-            this.tweetElement.href = this.tweetElement.getAttribute("title");
+          else if (this.tweetElement.hasAttribute("title")) {
+            this.tweetElement.setAttribute("href", this.tweetElement.getAttribute("title"));
             this.muteLtrCheck("mute_links");
           }
           // hashtags
-          else if (this.tweetElement.getAttribute("data-query-source")) {
+          else if (this.tweetElement.hasAttribute("data-query-source")) {
             this.muteLtrCheck("mute_tags");
           }
           // userIDs
@@ -492,6 +493,7 @@
               if (this.tweetElement.nextSibling !== null && this.tweetElement.nextSibling.nodeName === "#text") {
                 nodeValTemp += this.tweetElement.nextSibling.nodeValue;
               }
+              // alert(nodeValTemp);
               if (nodeValTemp.indexOf(targetLtr) >= 0) {
                 this.tweetPrnt.style.display = "none";
               }
@@ -501,13 +503,13 @@
         case "mute_links":
           if (GM_getValue("mute_link_flag") === true) {
             // not "pic.twitter.com"
-            if (this.tweetElement.getAttribute("title")) {
+            if (this.tweetElement.hasAttribute("title")) {
               if (this.tweetElement.getAttribute("title").indexOf(targetLtr) >= 0) {
                 this.tweetPrnt.style.display = "none";
               }
             }
             // "pic.twitter.com"
-            else if (this.tweetElement.innerHTML.replace(/<strong>|<\/strong>/g, "").indexOf(targetLtr) >= 0) {
+            else if (this.tweetElement.textContent.indexOf(targetLtr) >= 0) {
               this.tweetPrnt.style.display = "none";
             }
           }
@@ -515,7 +517,7 @@
         case "mute_tags":
           if (
             GM_getValue("mute_tag_flag") === true &&
-            this.tweetElement.childNodes[1].innerHTML.replace(/<strong>|<\/strong>/g, "").indexOf(targetLtr) >= 0
+            this.tweetElement.childNodes[1].textContent.indexOf(targetLtr) >= 0
           ) {
             this.tweetPrnt.style.display = "none";
           }
@@ -523,7 +525,7 @@
         case "mute_ids":
           if (
             GM_getValue("mute_userId_flag") === true &&
-            this.tweetElement.childNodes[1].innerHTML.replace(/<strong>|<\/strong>/g, "").indexOf(targetLtr) >= 0
+            this.tweetElement.childNodes[1].textContent.indexOf(targetLtr) >= 0
           ) {
             this.tweetPrnt.style.display = "none";
           }
