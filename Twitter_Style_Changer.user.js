@@ -3,13 +3,15 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Changes tweets' style on user pages of Twitter
-// @version     2.0
+// @version     2.1
 // @include     https://twitter.com/*
 // @exclude     https://twitter.com/
 // @exclude     https://twitter.com/search?*
 // @grant       none
 // ==/UserScript==
 (function () {
+  "use strict";
+
   var userPageStyleChange = function (addedTweets) {
         var userTweets = "",
             // all links
@@ -42,8 +44,12 @@
           }
         });
 
-        if (document.querySelector("[class='ScrollBump ScrollBump--recentlyFollowed']") !== null) {
-          document.querySelector("[class='ScrollBump ScrollBump--recentlyFollowed']").style.display = "none";
+        if (document.querySelectorAll("[class='ScrollBump ScrollBump--recentlyFollowed']") !== null) {
+          Array.prototype.slice.call(document.querySelectorAll("[class='ScrollBump ScrollBump--recentlyFollowed']")).forEach(
+            function (targetNode) {
+              targetNode.style.display = "none";
+            }
+          );
         }
 
         link.forEach(function (targetNode) {
