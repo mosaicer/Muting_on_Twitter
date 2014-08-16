@@ -9,6 +9,8 @@ Features (機能)
 ===============
 __This user script enables to mute texts/links/tags/userIDs on "Twitter Web Client".__
 * __This user script also works on "Search page".__
+* __Your timeline is refreshed automatically.__
+  - you disenable/enable this feature by using command menus.
 * This user script decides a language from a language of your browser.
   - when Japanese is used, please confirm a language of your browser.
 * __You can add/delete plural letters.__
@@ -22,12 +24,14 @@ __This user script changes tweets' style.__
 * letters which represent time turn blue.
 * texts(contents) of tweets are emphasized.
 
-![Firefox+Greasemonekyで動かしたときのスクリーンショット](https://pbs.twimg.com/media/Bu5LfixCYAARgMf.png:large "Firefox+Greasemonekyで動かしたときのスクリーンショット")
+![Firefox+Greasemoneky](https://pbs.twimg.com/media/Bu5LfixCYAARgMf.png:large "Firefox+Greasemoneky")
 
 ----------------------------------------------------------------------------------
 
 __このユーザースクリプトは、テキスト/リンク/タグ/ユーザーIDをミュートすることができます。__
 * __検索ページでもホームのページと同じようにミュートできます。__
+* __タイムラインは自動的に更新されます。__
+  - この機能はユーザースクリプトコマンドメニューから無効にできます。
 * 使っているブラウザの言語から日本語か英語のどちらを使うかを判断します。
   - 日本語にならない場合はブラウザの言語設定をご確認ください。
 * __複数の文字をミュートリストに追加/削除することができます。__
