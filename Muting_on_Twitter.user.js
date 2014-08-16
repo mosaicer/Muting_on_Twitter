@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     4.2
+// @version     5.0
 // @include     https://twitter.com/
 // @include     https://twitter.com/search?*
 // @grant       GM_getValue
@@ -13,18 +13,20 @@
 (function () {
   var Init = function() {
         this.menu_jp = {
+          autoRefresh_flag: ["自動更新を", {}],
+          style_flag: ["各ツイートの装飾を", {}],
           mute_text_flag: ["ツイート本文についてのミュートを", {}],
           mute_link_flag: ["リンクについてのミュートを", {}],
           mute_tag_flag: ["ハッシュタグについてのミュートを", {}],
-          mute_userId_flag: ["ユーザーIDについてのミュートを", {}],
-          style_flag: ["各ツイートの装飾を", {}]
+          mute_userId_flag: ["ユーザーIDについてのミュートを", {}]
         };
         this.menu_en = {
+          autoRefresh_flag: [" auto refresh", {}],
+          style_flag: [" change tweet style", {}],
           mute_text_flag: [" mute for texts in tweet", {}],
           mute_link_flag: [" mute for links in tweet", {}],
           mute_tag_flag: [" mute for hashtags in tweet", {}],
-          mute_userId_flag: [" mute for userIDs in tweet", {}],
-          style_flag: [" changing tweet style", {}]
+          mute_userId_flag: [" mute for userIDs in tweet", {}]
         };
         this.msgFlag = false;
         this.msg = "";
@@ -118,6 +120,9 @@
       // MutationObserver
       MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver,
       observer,
+      observerSub,
+      // MouseEvent
+      mouse_event,
       // decorate all tweets, not constructer
       tweetStyleChange = function() {
         // make font-weight of tweets' letters bold
@@ -187,9 +192,6 @@
       }
       if (typeof GM_getValue("form_flag") === "undefined") {
         GM_setValue("form_flag", true);
-      }
-      if (typeof GM_getValue("style_flag") === "undefined") {
-        GM_setValue("style_flag", true);
       }
     },
     // the function of command menus, make available or unavailable
@@ -547,7 +549,7 @@
     tweetStyleChange();
   }
 
-  // events of all buttons------------------------------------------------------------------
+  // events of all buttons------------------------------------------------------------------------------
   document.addEventListener("click", function (e) {
     var tgtNode = e.target; // nodes clicked
     switch (tgtNode.id) {
@@ -581,7 +583,7 @@
       default:
         // radio buttons
         if (tgtNode.name === "muteLetter") {
-          // check must be unique
+          // check mark must be unique
           if (document.querySelector("[checked]")) {
             document.querySelector("[checked]").removeAttribute("checked");
           }
@@ -590,7 +592,8 @@
         break;
     }
   }, false);
-  // MutationObserver-----------------------------------------------------------------------
+
+  // MutationObserver(Timeline)-------------------------------------------------------------------------
   observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
       if (GM_getValue("style_flag") === true) {
@@ -602,4 +605,20 @@
     });
   });
   observer.observe(document.getElementById("stream-items-id"), {childList: true } );
+
+  // Auto refresh---------------------------------------------------------------------------------------
+  if (GM_getValue("autoRefresh_flag") === true) {
+    // init mouse event
+    mouse_event = document.createEvent("MouseEvents");
+    mouse_event.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    // MutationObserver(Auto refresh)
+    observerSub = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        if (mutation.addedNodes.length !== 0) {
+          mutation.addedNodes[0].dispatchEvent(mouse_event);
+        }
+      });
+    });
+    observerSub.observe(document.querySelector("[class='stream-item js-new-items-bar-container']"), {childList: true } );
+  }
 })();
