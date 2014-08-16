@@ -1,3 +1,6 @@
+* __version 5.0__
+  - __add a feature of auto refresh__
+    + disenable/enable this feature from command menus
 * version 4.2
   - fix disposal of the tag `STRONG`
   - prohibit inputing the letter `,/` 
