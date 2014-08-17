@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     5.0
+// @version     5.1
 // @include     https://twitter.com/
 // @include     https://twitter.com/search?*
 // @grant       GM_getValue
@@ -27,6 +27,10 @@
           mute_link_flag: [" mute for links in tweet", {}],
           mute_tag_flag: [" mute for hashtags in tweet", {}],
           mute_userId_flag: [" mute for userIDs in tweet", {}]
+        };
+        this.timeSetMsg = {
+          ja: "時間の設定",
+          en: "Set time"
         };
         this.msgFlag = false;
         this.msg = "";
@@ -123,6 +127,9 @@
       observerSub,
       // MouseEvent
       mouse_event,
+      // move scroll bar
+      flag_autoRef = 0,
+      scrHeight,
       // decorate all tweets, not constructer
       tweetStyleChange = function() {
         // make font-weight of tweets' letters bold
@@ -193,12 +200,23 @@
       if (typeof GM_getValue("form_flag") === "undefined") {
         GM_setValue("form_flag", true);
       }
+      if (typeof GM_getValue("time") === "undefined") {
+        GM_setValue("time", "200");
+      }
+      GM_registerMenuCommand(this.timeSetMsg[userLang], this.timeSet);
     },
     // the function of command menus, make available or unavailable
     featuresChg: function(flagName) {
       this.msgFlag = GM_getValue(flagName) === true ? false : true;
       GM_setValue(flagName, this.msgFlag);
-      location.href = pageURL;
+      location.reload();
+    },
+    timeSet: function() {
+      var timeToDelay = prompt("", GM_getValue("time"));
+      if (timeToDelay !== null && timeToDelay !== "" && /\d+/g.test(timeToDelay)) {
+        GM_setValue("time", timeToDelay);
+        location.reload();
+      }
     }
   };
 
@@ -284,7 +302,7 @@
                 GM_setValue(btn_flag, setting.muteNameArray[btn_flag].join(splitWord) + splitWord + this.muteListTemp.join(splitWord));
               }
             }
-            location.href = pageURL;
+            location.reload();
           }
         } else {
           alert(this.altMsgAry[userLang][4]);
@@ -329,7 +347,7 @@
           }
           if (this.muteListTemp !== setting.muteNameArray[btn_flag]) {
             GM_setValue(this.btnFlag, this.muteListTemp.join(splitWord));
-            location.href = pageURL;
+            location.reload();
           }
         } else {
           alert(this.altMsgAry[userLang][4]);
@@ -596,11 +614,23 @@
   // MutationObserver(Timeline)-------------------------------------------------------------------------
   observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
+      var nodesWidth = 0, nodesList, i;
+      if (mutation.addedNodes.length !== 0) {
+        nodesList = mutation.addedNodes;
+        muteAction.muteTweet(nodesList);
+        if (flag_autoRef === 1) {
+          setTimeout(function() {
+            for (i = 0; i < nodesList.length; i++) {
+              nodesWidth += nodesList[i].clientHeight;
+            }
+            scrHeight = scrHeight + nodesWidth - 38;
+            window.scrollTo(0, scrHeight);
+          }, parseInt(GM_getValue("time")));
+          flag_autoRef = 0;
+        }
+      }
       if (GM_getValue("style_flag") === true) {
         tweetStyleChange();
-      }
-      if (mutation.addedNodes.length !== 0) {
-        muteAction.muteTweet(mutation.addedNodes);
       }
     });
   });
@@ -615,6 +645,8 @@
     observerSub = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
         if (mutation.addedNodes.length !== 0) {
+          flag_autoRef = 1;
+          scrHeight = window.pageYOffset;
           mutation.addedNodes[0].dispatchEvent(mouse_event);
         }
       });
