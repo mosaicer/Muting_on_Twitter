@@ -10,7 +10,7 @@ Features (機能)
 __This user script enables to mute texts/links/tags/userIDs on "Twitter Web Client".__
 * __This user script also works on "Search page".__
 * __Your timeline is refreshed automatically.__
-  - you disenable/enable this feature by using command menus.
+  - you disable/enable this feature by using command menus.
 * This user script decides a language from a language of your browser.
   - when Japanese is used, please confirm a language of your browser.
 * __You can add/delete plural letters.__
@@ -51,3 +51,9 @@ Notes (備考)
 * __This user script is instable on "Search page".__
   - The details are described on Issues.
   - _When you find bugs, please report them._
+* __Please reset time as to a feature of auto refresh by using command menus, if necessary.__
+  - If a scroll bar is not back, you should increase time.
+  - If a scroll bar is back, it should become more comfortable by decreasing time.
+  - _If you reset time and a scroll bar is not still back, please report the details._
+  - Default is `200`.
+* [This user script page on Greasy Fork](https://greasyfork.org/ja/scripts/4154-muting-on-twitter)
