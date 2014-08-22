@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     5.1
+// @version     5.2
 // @include     https://twitter.com/
 // @include     https://twitter.com/search?*
 // @grant       GM_getValue
@@ -393,8 +393,12 @@
   MuteFeatures.prototype = {
     muteTweet: function (addedTweets) {
       // remove promoted tweet
-      if (document.querySelector("[data-promoted='true']") !== null) {
-        document.querySelector("[data-promoted='true']").parentNode.style.display = "none";
+      if (document.querySelectorAll("[data-promoted='true']") !== null) {
+        Array.prototype.slice.call(document.querySelectorAll("[data-promoted='true']")).forEach(
+          function (targetNode) {
+            targetNode.parentNode.style.display = "none";
+          }
+        );
       }
       // remove a banner of header
       if (document.querySelector("[class='promptbird promptbird-below-black-bar']") !== null) {
@@ -601,7 +605,7 @@
       default:
         // radio buttons
         if (tgtNode.name === "muteLetter") {
-          // check mark must be unique
+          // remove the attribute "checked", if it already exists
           if (document.querySelector("[checked]")) {
             document.querySelector("[checked]").removeAttribute("checked");
           }
@@ -618,12 +622,15 @@
       if (mutation.addedNodes.length !== 0) {
         nodesList = mutation.addedNodes;
         muteAction.muteTweet(nodesList);
+        // a scroll bar is back
         if (flag_autoRef === 1) {
           setTimeout(function() {
-            for (i = 0; i < nodesList.length; i++) {
-              nodesWidth += nodesList[i].clientHeight;
+            if (scrHeight !== 0) {
+              for (i = 0; i < nodesList.length; i++) {
+                nodesWidth += nodesList[i].clientHeight;
+              }
+              scrHeight = scrHeight + nodesWidth - 38;
             }
-            scrHeight = scrHeight + nodesWidth - 38;
             window.scrollTo(0, scrHeight);
           }, parseInt(GM_getValue("time")));
           flag_autoRef = 0;
