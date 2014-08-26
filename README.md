@@ -56,4 +56,6 @@ Notes (備考)
   - If a scroll bar is back, it should become more comfortable by decreasing time.
   - _If you reset time and a scroll bar is not still back, please report the details._
   - Default is `200`.
-* [This user script page on Greasy Fork](https://greasyfork.org/ja/scripts/4154-muting-on-twitter)
+* __User script pages on Greasy Fork__
+  - [Muting on Twitter](https://greasyfork.org/scripts/4154-muting-on-twitter)
+  - [Twitter Style Changer](https://greasyfork.org/scripts/4175-twitter-style-changer)
