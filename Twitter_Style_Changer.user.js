@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Changes tweets' style on user pages of Twitter
-// @version     2.1
+// @version     2.2
 // @include     https://twitter.com/*
 // @exclude     https://twitter.com/
 // @exclude     https://twitter.com/search?*
@@ -49,6 +49,16 @@
             function (targetNode) {
               targetNode.style.display = "none";
             }
+          );
+        }
+
+        // change images' link
+        if (document.querySelectorAll("[class='TwitterPhoto-link media-thumbnail twitter-timeline-link']") !== null) {
+          Array.prototype.slice.call(document.querySelectorAll("[class='TwitterPhoto-link media-thumbnail twitter-timeline-link']")).forEach(
+              function (targetNode) {
+                targetNode.setAttribute("target", "_blank");
+                targetNode.setAttribute("class", "twitter-timeline-link");
+              }
           );
         }
 
