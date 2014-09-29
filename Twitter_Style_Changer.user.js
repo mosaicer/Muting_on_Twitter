@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Changes tweets' style on user pages of Twitter
-// @version     2.2
+// @version     2.3
 // @include     https://twitter.com/*
 // @exclude     https://twitter.com/
 // @exclude     https://twitter.com/search?*
@@ -25,18 +25,24 @@
         else {
           userTweets = Array.prototype.slice.call(document.querySelectorAll("[data-component-term='tweet']"));
           userProfLink = document.querySelector("[class='u-textUserColor']");
-          userProfLink.setAttribute("href", userProfLink.getAttribute("title"));
+          if (userProfLink !== null) {
+            userProfLink.setAttribute("href", userProfLink.getAttribute("title"));
+          }
         }
 
         userTweets.forEach(function (targetNode) {
-          var tweetDivTag; // div.ProfileTweet-contents
+          var tweetDivTag;
           if (typeof targetNode.childNodes[3] === "undefined") {
+            // div.ProfileTweet-contents
             tweetDivTag = targetNode.childNodes[1].childNodes[1].childNodes[1].childNodes[3];
+            // p.ProfileTweet-text js-tweet-text u-dir
             tweetDivTag.childNodes[1].style.fontSize = "12px";
             tweetDivTag.childNodes[1].style.lineHeight = "18px";
-            if (tweetDivTag.childNodes[3].nodeName === "DIV") {
+            // div.ProfileTweet-contextualLink u-textUserColor  ->  link
+            if (typeof tweetDivTag.childNodes[5] !== "undefined") {
               tweetDivTag.childNodes[5].style.height = "7px";
             }
+            // div.ProfileTweet-actionList u-cf js-actions  ->  not link
             else {
               tweetDivTag.childNodes[3].style.height = "7px";
               tweetDivTag.childNodes[3].style.marginTop = "-7px";
@@ -52,7 +58,6 @@
           );
         }
 
-        // change images' link
         if (document.querySelectorAll("[class='TwitterPhoto-link media-thumbnail twitter-timeline-link']") !== null) {
           Array.prototype.slice.call(document.querySelectorAll("[class='TwitterPhoto-link media-thumbnail twitter-timeline-link']")).forEach(
               function (targetNode) {
