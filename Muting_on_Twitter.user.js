@@ -3,12 +3,13 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     5.2
+// @version     5.3
 // @include     https://twitter.com/
 // @include     https://twitter.com/search?*
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_registerMenuCommand
+// @grant       GM_addStyle
 // ==/UserScript==
 (function () {
   var Init = function() {
@@ -43,22 +44,29 @@
       },
       setting,
       HeaderStruct = function() {
-        this.contentHeader = document.querySelector(".content-header");
-        this.headerInner = document.querySelector(".header-inner");
-        this.previousNode = pageURL === "https://twitter.com/" ?
+        // tweet form
+        this.tweet_box = document.querySelector(".timeline-tweet-box");
+        // the previous node of input form
+        this.previousNode = pageURL === twitterHomeURL ?
           document.querySelector("[class='DashboardProfileCard  module']") :
           document.querySelector("[class='module'][role='navigation']");
-        this.parentFormNode = pageURL === "https://twitter.com/" ?
-          document.querySelector("[class='dashboard dashboard-left ']") :
+        // the previous node of tweet form
+        this.previousNode_tweet = pageURL === twitterHomeURL ? this.tweet_box : document.querySelector(".content-header");
+        // the parent node of input form and tweet form
+        this.parentFormNode = pageURL === twitterHomeURL ?
+          document.querySelector("[class='dashboard dashboard-left home-exp-tweetbox']") :
           document.querySelector("[class='dashboard dashboard-left']");
+        // input form
         this.formNode = document.createElement("div");
-        this.formContainer = "";
-        this.headerWidth = pageURL === "https://twitter.com/" ? 418 : 440;
+        this.headerWidth = pageURL === twitterHomeURL ? 418 : 440;
+        // custom button
         this.openClose_msg = {
-          ja: "▶ フォーム欄の開閉 ◀",
-          en: "▶ Open/Close input form ◀"
+          ja: ["▶ フォーム欄の開閉 ◀", "▶ ツイート欄の開閉 ◀"],
+          en: ["▶ Open/Close input form ◀", "▶ Open/Close tweet form ◀"]
         };
         this.openClose_btn = document.createElement("div");
+        this.openClose_btn_tweet = document.createElement("div");
+        // text of input form
         this.btnAry = {
           ja: ["追加", "削除", "確認"],
           en: ["Add", "Del", "Conf"]
@@ -110,8 +118,6 @@
         this.homeTweets = "";
         this.replyPrnt = ""; // parent nodes of tweets of reply
         this.flag = "";
-        this.i = 0;
-        this.j = 0;
         // use when judging elements
         this.tweetPrnt = "";
         this.tweetElement = "";
@@ -119,12 +125,14 @@
       muteAction,
       key = "",
       pageURL = location.href,
+      twitterHomeURL = "https://twitter.com/",
       userLang = window.navigator.language === "ja" ? "ja" : "en",
       splitWord = ",/",
       // MutationObserver
       MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver,
       observer,
       observerSub,
+      observerSub2,
       // MouseEvent
       mouse_event,
       // move scroll bar
@@ -133,7 +141,7 @@
       // decorate all tweets, not constructer
       tweetStyleChange = function() {
         // make font-weight of tweets' letters bold
-        if (pageURL === "https://twitter.com/") {
+        if (pageURL === twitterHomeURL) {
           Array.prototype.slice.call(document.querySelectorAll("[class='js-tweet-text tweet-text']")).forEach(
             function (targetNode) {
               targetNode.style.fontWeight = "bold";
@@ -221,30 +229,31 @@
   };
 
   HeaderStruct.prototype.styleSet = function () {
-    // change a header's style
-    if (pageURL === "https://twitter.com/") {
-      this.contentHeader.style.borderStyle = "hidden";
-      this.headerInner.style.height = "65px";
-      this.headerInner.style.backgroundColor = "transparent";
-    }
     // set a button that shows/hides input form
     this.openClose_btn.setAttribute("id", "open_close");
+    this.openClose_btn.setAttribute("class", "custom_button");
     this.openClose_btn.style.backgroundColor = "#FFD700";
-    this.openClose_btn.style.cursor = "pointer";
-    this.openClose_btn.style.width = "290px";
-    this.openClose_btn.style.textAlign = "center";
-    this.openClose_btn.style.marginBottom = "15px";
-    this.openClose_btn.appendChild(document.createTextNode(this.openClose_msg[userLang]));
+    this.openClose_btn.appendChild(document.createTextNode(this.openClose_msg[userLang][0]));
     this.parentFormNode.insertBefore(this.openClose_btn, this.previousNode);
+
+    // set a button that shows/hides tweet form
+    if (pageURL === twitterHomeURL) {
+      this.openClose_btn_tweet.setAttribute("id", "open_close_tweet");
+      this.openClose_btn_tweet.setAttribute("class", "custom_button");
+      this.openClose_btn_tweet.style.backgroundColor = "#F9FBC1";
+      this.openClose_btn_tweet.appendChild(document.createTextNode(this.openClose_msg[userLang][1]));
+      this.parentFormNode.insertBefore(this.openClose_btn_tweet, this.previousNode);
+    }
+
     // construct a container of input form
-    this.formContainer = "<form onsubmit='return false;'>" +
+    this.formNode.innerHTML = "<form onsubmit='return false;'>" +
           "<input type='text' id='mLtrForm' class='form_btn' value='' placeholder='" +
           this.placeholderAry[userLang][0] + "' style='width: " + this.headerWidth + "px;'>" +
           "<input type='button' id='mLtrAdd' class='form_btn' value='" + this.btnAry[userLang][0] + "'>" +
           "<input type='button' id='mLtrRmv' class='form_btn' value='" + this.btnAry[userLang][1] + "'>" +
           "<input type='button' id='mLtrConf' value='" + this.btnAry[userLang][2] + "' style='color:black;'>" +
           "</form><div style='background-color:white; margin-top:8px; font-size:12px; color:black; height:23px;'>" +
-          "<span style='color:green;'>" + this.placeholderAry[userLang][5] + "：　</span>" +
+          "<span style='color:green; margin-left:5px;'>" + this.placeholderAry[userLang][5] + "：　</span>" +
           "<label style='margin-right: 17px;'><input type='radio' name='muteLetter' value='mute_words' checked>" +
           this.placeholderAry[userLang][1] + "</label>" +
           "<label style='margin-right: 17px;'><input type='radio' name='muteLetter' value='mute_links'>" +
@@ -253,27 +262,14 @@
           this.placeholderAry[userLang][3] + "</label>" +
           "<label style='margin-right: 17px;'><input type='radio' name='muteLetter' value='mute_ids'>" +
           this.placeholderAry[userLang][4] + "</label></div>";
-    if (pageURL === "https://twitter.com/") {
-      document.getElementById("content-main-heading").innerHTML = this.formContainer;
-    } else {
-      this.formNode.style.marginBottom = "10px";
-      this.formNode.style.textAlign = "center";
-      this.formNode.innerHTML = this.formContainer;
-      document.getElementById("timeline").insertBefore(this.formNode, this.contentHeader);
-    }
-    Array.prototype.slice.call(document.querySelectorAll(".form_btn")).forEach(
-      function (targetNode) {
-        targetNode.style.marginRight = "10px";
-        targetNode.style.color = "black";
-      }
-    );
+    this.formNode.style.marginBottom = "10px";
+
+    // insert the input form
+    document.getElementById("timeline").insertBefore(this.formNode, this.previousNode_tweet);
+
     // check the flag of input form
     if (GM_getValue("form_flag") === false) {
-      if (pageURL === "https://twitter.com/") {
-        this.contentHeader.style.display = "none";
-      } else {
-        this.formNode.style.display = "none";
-      }
+      this.formNode.style.display = "none";
     }
   };
 
@@ -416,7 +412,7 @@
       this.homeTweets.forEach(this.nodeCheck, muteAction);
     },
     nodeCheck: function (targetNode) {
-      var tweetPtag;
+      var tweetPtag, i;
       if (targetNode.hasAttribute("data-item-type")) {
         this.tweetPrnt = targetNode;
         if (typeof this.tweetPrnt.childNodes[1].childNodes[3] !== "undefined") {
@@ -424,9 +420,9 @@
         }
         // reply
         if (typeof tweetPtag === "undefined") {
-          if (pageURL === "https://twitter.com/") {
-            for (this.i = 3; typeof this.tweetPrnt.childNodes[1].childNodes[this.i] !== "undefined"; this.i++) {
-              this.replyPrnt = this.tweetPrnt.childNodes[1].childNodes[this.i];
+          if (pageURL === twitterHomeURL) {
+            for (i = 3; typeof this.tweetPrnt.childNodes[1].childNodes[i] !== "undefined"; i++) {
+              this.replyPrnt = this.tweetPrnt.childNodes[1].childNodes[i];
               if (
                 typeof this.replyPrnt.childNodes[1] !== "undefined" &&
                 this.replyPrnt.childNodes[1].getAttribute("data-you-block")
@@ -459,13 +455,13 @@
       }
     },
     tweetElmCheck: function(twtPtag) {
-      for (this.j = 0; typeof twtPtag.childNodes[this.j] !== "undefined"; this.j++) {
-        this.tweetElement = twtPtag.childNodes[this.j];
+      var j;
+      for (j = 0; typeof twtPtag.childNodes[j] !== "undefined"; j++) {
+        this.tweetElement = twtPtag.childNodes[j];
         // <A> tag
         if (this.tweetElement.nodeName === "A") {
           // "pic.twitter.com"
           if (this.tweetElement.hasAttribute("data-pre-embedded")) {
-            this.tweetElement.setAttribute("href", "http://" + this.tweetElement.childNodes[0].nodeValue);
             this.muteLtrCheck("mute_links");
           }
           // not "pic.twitter.com"
@@ -571,6 +567,15 @@
     tweetStyleChange();
   }
 
+  if (pageURL === twitterHomeURL) {
+    // init mouse event
+    mouse_event = document.createEvent("MouseEvents");
+    mouse_event.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+  }
+
+  // add style to custom class
+  GM_addStyle(".custom_button { cursor: pointer; width: 290px; text-align: center; margin-bottom: 15px; } .form_btn { margin-right: 10px; color: black; }");
+
   // events of all buttons------------------------------------------------------------------------------
   document.addEventListener("click", function (e) {
     var tgtNode = e.target; // nodes clicked
@@ -578,20 +583,20 @@
       // input form
       case "open_close":
         if (GM_getValue("form_flag") === true) {
-          if (pageURL === "https://twitter.com/") {
-            header.contentHeader.style.display = "none";
-          } else {
-            header.formNode.style.display = "none";
-          }
+          header.formNode.style.display = "none";
           GM_setValue("form_flag", false);
         } else {
-          if (pageURL === "https://twitter.com/") {
-            header.contentHeader.style.display = "block";
-          } else {
-            header.formNode.style.display = "block";
-          }
+          header.formNode.style.display = "block";
           GM_setValue("form_flag", true);
         }
+        break;
+      // tweet form
+      case "open_close_tweet":
+          if (header.tweet_box.style.display !== "none") {
+            header.tweet_box.style.display = "none";
+          } else {
+            header.tweet_box.style.display = "block";
+          }
         break;
       case "mLtrAdd":
         buttonAction.addMuteLtr(document.querySelector("[checked]").value, document.getElementById("mLtrForm").value);
@@ -635,9 +640,9 @@
           }, parseInt(GM_getValue("time")));
           flag_autoRef = 0;
         }
-      }
-      if (GM_getValue("style_flag") === true) {
-        tweetStyleChange();
+        if (GM_getValue("style_flag") === true) {
+          tweetStyleChange();
+        }
       }
     });
   });
@@ -645,9 +650,6 @@
 
   // Auto refresh---------------------------------------------------------------------------------------
   if (GM_getValue("autoRefresh_flag") === true) {
-    // init mouse event
-    mouse_event = document.createEvent("MouseEvents");
-    mouse_event.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
     // MutationObserver(Auto refresh)
     observerSub = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
