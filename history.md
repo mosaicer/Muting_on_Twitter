@@ -1,3 +1,5 @@
+* version 5.3
+  - fix the content header with specifications of Twitter
 * version 5.2
   - fix some bugs
 * verison 5.1
