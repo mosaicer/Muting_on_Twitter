@@ -1,39 +1,45 @@
+* __version 6.0__
+  - __Enable expanding the timeline__
+  - __Improve performance__
+    * Fix the source-code
+    * Fix the logic of muting
+    * Prohibit reloading the page when user script commands are called
 * version 5.3
-  - fix the content header with specifications of Twitter
+  - Fix the content header with specifications of Twitter
 * version 5.2
-  - fix some bugs
+  - Fix some bugs
 * verison 5.1
-  - fix a feature of auto refresh
+  - Fix a feature of auto refresh
 * __version 5.0__
-  - __add a feature of auto refresh__
-    + disable/enable this feature from command menus
+  - __Add a feature of auto refresh__
+    + Disable/enable this feature from command menus
 * version 4.2
-  - fix disposal of the tag `STRONG`
-  - prohibit inputing the letter `,/` 
+  - Fix disposal of the tag `STRONG`
+  - Prohibit inputing the letter `,/` 
 * version 4.1
-  - fix all comments
-  - fix some alert messages
+  - Fix all comments
+  - Fix some alert messages
 * __version 4.0__
-  - __include "https://twitter.com/search?*"__
-    + _it has instability_; that is written at Issues.
-  - improve input form
+  - __Include "https://twitter.com/search?*"__
+    + _It has instability_; that is written at Issues.
+  - Improve the input form
 * version 3.1
-  - improve buttons of header
-    + move a button of form to the top of user's information
-    + delete a button to jump at the top of page
+  - Improve buttons of header
+    + Move a button of form to the top of user's information
+    + Delete a button to jump at the top of page
 * __version 3.0__
-  - __be faster not to use "require"__
-  - __enable to mute tweets for userIDs__
-  - __enable to input plural letters__
-    + please divide them by the letter ",/"
-  - delete a flag of language
-    + decide a language by checking a language of a browser
+  - __Be faster not to use "require"__
+  - __Enable to mute tweets for userIDs__
+  - __Enable to input plural letters__
+    + Please divide them by the letter `,/`
+  - Delete a flag of language
+    + Decide a language by checking a language of your browser
 * __version 2.0__
-  - __available on Chrome(+Tampermonkey)__
-  - __delete a feature which works on user pages__
-    + _this feature moved to the user script ["Twitter Style Changer"](https://github.com/mosaicer/Muting_on_Twitter/blob/master/Twitter_Style_Changer.user.js)_
-  - close to "strict mode"
+  - __Available on Chrome(+Tampermonkey)__
+  - __Delete a feature which works on user pages__
+    + _This feature moved to the user script ["Twitter Style Changer"](https://github.com/mosaicer/Muting\_on\_Twitter/blob/master/Twitter\_Style\_Changer.user.js)_
+  - Close to the "strict mode"
 * version 1.1
-  - change commentouts' position
+  - Change commentouts' position
 * version 1.0
-  - release
+  - Release
