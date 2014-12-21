@@ -19,6 +19,7 @@ __This user script enables to mute texts/links/tags/userIDs on "Twitter Web Clie
   - you can choose necessary features for you _without reloading the page_.
 
 __This user script enables expanding the timeline.__
+
 ![the expanded timeline](https://box.c.yimg.jp/res/box-s-ifzsxby3sf3p7ibx45hzwgzsne-1001?uid=2ff38f21-1023-44d9-9b3d-c06843d431a2&etag=d32d125f1419157813325432 "the expanded timeline")
 
 __This user script changes tweets' style.__
