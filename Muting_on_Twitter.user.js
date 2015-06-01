@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     6.0
+// @version     6.1
 // @include     https://twitter.com/
 // @include     https://twitter.com/search?*
 // @grant       GM_getValue
@@ -141,11 +141,11 @@
       },
       // Construct the header
       muteForm = document.createElement('div'),
-      timeline = document.getElementById('timeline'),
+      timeline = !!document.getElementById('timeline') ? document.getElementById('timeline') : document.querySelector('.GridTimeline'),
       pageContainer = document.getElementById('page-container'),
       muteInputForm,
       // on home page, this is tweet form
-      timelineHeader = timeline.childNodes[1],
+      timelineHeader = document.querySelector('.timeline-tweet-box'),
       setHeaderAndBtn = function () {
         var btnToOpenCloseMuteForm = document.createElement('div'),
             openCloseBtnText = {
@@ -182,7 +182,8 @@
               en: 'By clicking the left icon, the timeline is expanded/contracted'
             },
             muteFormWidth = 440,
-            leftDashBorad = pageContainer.childNodes[1],
+            leftDashBorad = urlCheckFlag ? pageContainer.childNodes[1] :
+              document.querySelector('.SidebarCommonModules'),
             btnToOpenCloseTweet,
             // DashBoardProfileCard or module
             leftDashBoradTop = leftDashBorad.childNodes[1];
@@ -241,9 +242,9 @@
               placeholderArrayTemp[4] + '</label></div>';
 
         muteForm.style.marginBottom = '10px';
-        timeline.insertBefore(muteForm, timelineHeader);
+        timeline.insertBefore(muteForm, timeline.childNodes[1]);
 
-        if (!flagList['form_flag']) {
+        if (!flagList.form_flag) {
           muteForm.classList.add(VISIVILITY_CLASS);
         }
       },
@@ -429,14 +430,12 @@
         twiHeader.childNodes[6].style.color = 'red';
       },
       muteTweet = function (addedTweets) {
-        var styleFlag = flagList['style_flag'],
+        var styleFlag = flagList.style_flag,
             homeTweets;
 
         // remove promoted tweet
         if (!!document.querySelector('[data-promoted="true"]')) {
-          Array.prototype.slice.call(
-            document.querySelectorAll('[data-promoted="true"]')
-          ).forEach(
+          [].forEach.call(document.querySelectorAll('[data-promoted="true"]'),
             function (targetNode) {
               targetNode.parentNode.style.display = 'none';
             }
@@ -449,11 +448,11 @@
 
         // when nodes are added
         if (!!addedTweets) {
-          homeTweets = Array.prototype.slice.call(addedTweets);
+          homeTweets = [].slice.call(addedTweets);
         }
         // when nodes are not added
         else {
-          homeTweets = Array.prototype.slice.call(
+          homeTweets = [].slice.call(
             document.querySelectorAll('[data-item-type]')
           );
         }
@@ -508,9 +507,9 @@
                       }
                       // on Search page, user name
                       else {
-                        tweetHeader = tweetHeader.childNodes[1];
-                        tweetHeader.childNodes[3].style.color = 'red';
-                        tweetHeader.childNodes[5].style.color = 'red';
+                        tweetHeader = tweetPtag.nextSibling.nextSibling;
+                        tweetHeader.childNodes[1].style.color = 'red';
+                        tweetHeader.childNodes[3].childNodes[1].style.color = 'red';
                       }
                     }
                   }
@@ -568,7 +567,7 @@
       */
       checkTweetElement = function(twiPtag) {
         var muteSuccessFlag = true,
-            styleFlag = flagList['style_flag'],
+            styleFlag = flagList.style_flag,
             j,
             tweetElement;
 
@@ -640,10 +639,10 @@
           for (k = 0; k < muteArraySize && checkFlag; k++) {
             switch (muteType) {
               case 'mute_words':
-                if (flagList['mute_text_flag']) {
+                if (flagList.mute_text_flag) {
                   // text
                   if (twiElement.nodeName === '#text') {
-                    checkFlag = !(twiElement.nodeValue.indexOf(muteArray[k]) >= 0);
+                    checkFlag = (twiElement.nodeValue.indexOf(muteArray[k]) < 0);
                   }
                   // <STRONG> tag
                   else {
@@ -666,27 +665,27 @@
                       nodeValueTemp += twiElement.nextSibling.nodeValue;
                     }
 
-                    checkFlag = !(nodeValueTemp.indexOf(muteArray[k]) >= 0);
+                    checkFlag = (nodeValueTemp.indexOf(muteArray[k]) < 0);
                   }
                 }
                 break;
               case 'mute_links':
-                if (flagList['mute_link_flag']) {
+                if (flagList.mute_link_flag) {
                   // not "pic.twitter.com"
                   if (twiElement.hasAttribute('title')) {
-                    checkFlag = !(twiElement.getAttribute('title').indexOf(muteArray[k]) >= 0);
+                    checkFlag = (twiElement.getAttribute('title').indexOf(muteArray[k]) < 0);
                   }
                   // "pic.twitter.com"
                   else {
-                    checkFlag = !(twiElement.textContent.indexOf(muteArray[k]) >= 0);
+                    checkFlag = (twiElement.textContent.indexOf(muteArray[k]) < 0);
                   }
                 }
                 break;
               case 'mute_tags':
-                checkFlag = !(flagList['mute_tag_flag'] && twiElement.childNodes[1].textContent.indexOf(muteArray[k]) >= 0);
+                checkFlag = !(flagList.mute_tag_flag && twiElement.childNodes[1].textContent.indexOf(muteArray[k]) >= 0);
                 break;
               case 'mute_ids':
-                checkFlag = !(flagList['mute_userId_flag'] && twiElement.childNodes[1].textContent.indexOf(muteArray[k]) >= 0);
+                checkFlag = !(flagList.mute_userId_flag && twiElement.childNodes[1].textContent.indexOf(muteArray[k]) >= 0);
                 break;
             }
           }
@@ -803,8 +802,8 @@
       case 'open_close':
         muteForm.classList.toggle(VISIVILITY_CLASS);
 
-        tempFlag = !flagList['form_flag'];
-        flagList['form_flag'] = tempFlag;
+        tempFlag = !flagList.form_flag;
+        flagList.form_flag = tempFlag;
 
         GM_setValue('form_flag', tempFlag);
         break;
@@ -844,7 +843,7 @@
           if (tlExpandFlag) {
             pageContainer.insertBefore(timeline, rightDashBoard);
 
-            if (flagList['form_flag']) {
+            if (flagList.form_flag) {
               muteForm.classList.remove(VISIVILITY_CLASS);
             }
           } else {
