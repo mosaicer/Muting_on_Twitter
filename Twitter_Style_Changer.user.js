@@ -3,106 +3,85 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Changes tweets' style on user pages of Twitter
-// @version     2.4
+// @version     3.0
 // @include     https://twitter.com/*
 // @exclude     https://twitter.com/
 // @exclude     https://twitter.com/search?*
 // @grant       GM_registerMenuCommand
 // ==/UserScript==
 (function () {
-  "use strict";
+  'use strict';
 
-  var openUsrHeaderImg = function (imgUrl) {
-        window.open(imgUrl);
+  var headerImgUrl = document.querySelector('[class="ProfileCanopy-headerBg"]')
+        .childNodes[1]
+        .getAttribute('src'),
+      openUsrHeaderImg = function () {
+        window.open(headerImgUrl);
       },
-      userPageStyleChange = function (addedTweets) {
-        var userTweets = "",
-            // all links
-            link = Array.prototype.slice.call(document.querySelectorAll("[class='twitter-timeline-link']")),
-            // a url of header img
-            headerImgUrl,
-            // the link of the bottom of user profile
-            userProfLink;
-
-        if (typeof addedTweets !== "undefined") {
-          userTweets = Array.prototype.slice.call(addedTweets);
-        }
-        // call at first
-        else {
-          //
-          headerImgUrl = document.querySelector("div[class='ProfileCanopy-headerBg']").childNodes[1].getAttribute("src");
-          GM_registerMenuCommand("Open this header image", openUsrHeaderImg.bind(null, headerImgUrl));
-          userTweets = Array.prototype.slice.call(document.querySelectorAll("[data-component-term='tweet']"));
-          userProfLink = document.querySelector("[class='u-textUserColor']");
-          if (userProfLink !== null) {
-            userProfLink.setAttribute("href", userProfLink.getAttribute("title"));
-          }
-        }
+      changeUserPageStyle = function (addedTweets) {
+        var userTweets = !!addedTweets ?
+            [].slice.call(addedTweets.addedNodes) :
+            [].slice.call(document.querySelectorAll('[data-item-type="tweet"]'));
 
         userTweets.forEach(function (targetNode) {
-          var tweetDivTag, tweetFrame;
-          if (typeof targetNode.childNodes[3] === "undefined") {
-            // div.ProfileTweet u-textBreak js-tweet js-stream-tweet js-actionable-tweet     ProfileTweet--high
-            tweetFrame = targetNode.childNodes[1].childNodes[1].childNodes[1];
-            tweetFrame.style.marginBottom = "-10px";
-            // div.ProfileTweet-contents
-            tweetDivTag = tweetFrame.childNodes[3];
-            // p.ProfileTweet-text js-tweet-text u-dir
-            tweetDivTag.childNodes[1].style.fontSize = "12px";
-            tweetDivTag.childNodes[1].style.lineHeight = "18px";
-            // div.ProfileTweet-contextualLink u-textUserColor  ->  link
-            if (typeof tweetDivTag.childNodes[5] !== "undefined") {
-              tweetDivTag.childNodes[5].style.height = "7px";
-            }
-            // div.ProfileTweet-actionList u-cf js-actions  ->  not link
-            else {
-              tweetDivTag.childNodes[3].style.height = "30px";
-              tweetDivTag.childNodes[3].style.marginTop = "-7px";
-            }
+          var tweetFrame = targetNode.childNodes[1],
+              tweetContext,
+              nodeListSize;
+
+          // destroy follow entry!
+          if (targetNode.getAttribute('data-item-type') === 'follow_entry') {
+            targetNode.style.display = 'none';
+            return;
           }
-        });
 
-        if (document.querySelectorAll("[class='ScrollBump ScrollBump--recentlyFollowed']") !== null) {
-          Array.prototype.slice.call(document.querySelectorAll("[class='ScrollBump ScrollBump--recentlyFollowed']")).forEach(
-            function (targetNode) {
-              targetNode.style.display = "none";
-            }
-          );
-        }
+          // the tweet is fixed tweet or retweet
+          if (tweetFrame.tagName === 'OL') {
+            tweetFrame = tweetFrame.childNodes[1].childNodes[1];
+          }
 
-        if (document.querySelectorAll("[class='TwitterPhoto-link media-thumbnail twitter-timeline-link']") !== null) {
-          Array.prototype.slice.call(document.querySelectorAll("[class='TwitterPhoto-link media-thumbnail twitter-timeline-link']")).forEach(
-              function (targetNode) {
-                targetNode.setAttribute("target", "_blank");
-                targetNode.setAttribute("class", "twitter-timeline-link");
+          tweetContext = tweetFrame.childNodes[3];
+          nodeListSize = tweetContext.childNodes.length;
+
+          tweetContext.childNodes[nodeListSize - 2].style.marginBottom = '-7px';
+          tweetContext.childNodes[nodeListSize - 2].childNodes[7].style.marginTop = '-7px';
+
+          // quoted tweet
+          if (nodeListSize > 14) {
+            tweetContext.childNodes[5].style.fontSize = '12px';
+            tweetContext.childNodes[5].style.lineHeight = '18px';
+          } else {
+            tweetContext.childNodes[3].style.fontSize = '12px';
+            tweetContext.childNodes[3].style.lineHeight = '18px';
+          }
+
+          [].forEach.call(
+            targetNode.querySelectorAll('[class="twitter-timeline-link"]'),
+            function (linkNode) {
+              if (linkNode.hasAttribute('title')) {
+                linkNode.setAttribute('href', linkNode.getAttribute('title'));
               }
-          );
-        }
 
-        link.forEach(function (targetNode) {
-          // "pic.twitter.com"
-          if (targetNode.hasAttribute("data-pre-embedded")) {
-            targetNode.setAttribute("href", "http://" + targetNode.childNodes[0].nodeValue);
-          }
-          // not "pic.twitter.com"
-          else if (targetNode.hasAttribute("title")) {
-            targetNode.setAttribute("href", targetNode.getAttribute("title"));
-          }
-          targetNode.setAttribute("target", "_blank");
+              linkNode.setAttribute('target', '_blank');
+            }
+          );
         });
       },
+      userProfLink = document.querySelector('[class="u-textUserColor"]'),
       // MutationObserver
       MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver,
-      observer;
+      observer = new MutationObserver(function (mutations) {
+        mutations.forEach(changeUserPageStyle);
+      });
 
-  userPageStyleChange();
-  // MutationObserver-------------------------------------------------------------------
-  observer = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-      if (mutation.addedNodes.length !== 0) {
-        userPageStyleChange(mutation.addedNodes);
-      }
-    });
-  });
-  observer.observe(document.querySelector("[class='GridTimeline-items']"), {childList: true } );
+  GM_registerMenuCommand('Open this header image', openUsrHeaderImg);
+
+  if (!!userProfLink) {
+    userProfLink.setAttribute('href', userProfLink.getAttribute('title'));
+  }
+
+  observer.observe(
+    document.getElementById('stream-items-id'), {childList: true }
+  );
+
+  changeUserPageStyle();
 })();
