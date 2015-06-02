@@ -1,3 +1,5 @@
+* version 6.1
+  - Fix bugs
 * __version 6.0__
   - __Enable expanding the timeline__
   - __Improve performance__
@@ -15,7 +17,7 @@
     + Disable/enable this feature from command menus
 * version 4.2
   - Fix disposal of the tag `STRONG`
-  - Prohibit inputing the letter `,/` 
+  - Prohibit inputing the letter `,/`
 * version 4.1
   - Fix all comments
   - Fix some alert messages
