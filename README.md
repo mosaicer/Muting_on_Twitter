@@ -30,6 +30,9 @@ __This user script changes tweets' style.__
 
 ![Firefox+Greasemoneky](https://box.c.yimg.jp/res/box-s-ifzsxby3sf3p7ibx45hzwgzsne-1001?uid=5cc76a38-aae5-4091-a104-edc6ded4eb69&etag=27603db9141915781190803 "Firefox+Greasemoneky")
 
+__This user script can set background image on home.__
+* please input the url of background image to prompt from command menus.
+
 ----------------------------------------------------------------------------------
 
 __このユーザースクリプトは、テキスト/リンク/タグ/ユーザーIDをミュートすることができます。__
@@ -53,6 +56,9 @@ __また、ツイートのスタイルを変更します。__
 * ツイート本文は太字になります。
 
 ![Firefox+Greasemonekyで動かしたときのスクリーンショット](https://box.c.yimg.jp/res/box-s-ifzsxby3sf3p7ibx45hzwgzsne-1001?uid=267457e0-db3a-4986-bb15-e30368741e3a&etag=a8c4f43a141915781098919 "Firefox+Greasemonekyで動かしたときのスクリーンショット")
+
+__ホームの背景画像をセットすることができます。__
+* コマンドメニューから背景画像のURLを入力してください。
 
 Notes (備考)
 =============
