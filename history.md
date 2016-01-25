@@ -11,7 +11,9 @@
       * Input the url of background image to prompt from CommandMenu
     + Mute quoted tweet
   - __Fix bugs__
-    + #4 and some small bugs
+    + issue4
+      * [the detail __in Japanese__](http://cyanoa.blogspot.jp/2016/01/web.html)
+    + some small bugs
 * version 6.1
   - Fix bugs
 * __version 6.0__
