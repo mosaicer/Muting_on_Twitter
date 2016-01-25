@@ -1,3 +1,17 @@
+* __version 7.0__
+  - __Refactor__
+    + Following [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript)
+  - __Make use of features of ES6__
+    + Arrows
+    + Template Strings
+    + Let + Const
+    + String + Array APIs
+  - __Add new features__
+    + Set a background image on home
+      * Input the url of background image to prompt from CommandMenu
+    + Mute quoted tweet
+  - __Fix bugs__
+    + #4 and some small bugs
 * version 6.1
   - Fix bugs
 * __version 6.0__
@@ -10,7 +24,7 @@
   - Fix the content header with specifications of Twitter
 * version 5.2
   - Fix some bugs
-* verison 5.1
+* version 5.1
   - Fix a feature of auto refresh
 * __version 5.0__
   - __Add a feature of auto refresh__
@@ -42,6 +56,6 @@
     + _This feature moved to the user script ["Twitter Style Changer"](https://github.com/mosaicer/Muting\_on\_Twitter/blob/master/Twitter\_Style\_Changer.user.js)_
   - Close to the "strict mode"
 * version 1.1
-  - Change commentouts' position
+  - Change positions of comment outs
 * version 1.0
   - Release
