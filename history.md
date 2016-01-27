@@ -1,3 +1,7 @@
+* version 7.1
+  - Fix bugs
+    + issue4
+    + some small bugs
 * __version 7.0__
   - __Refactor__
     + Following [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript)
