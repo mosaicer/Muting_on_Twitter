@@ -3,16 +3,17 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     7.0
-// @include     https://twitter.com/
-// @include     https://twitter.com/search?*
+// @version     7.1
+// @match       https://twitter.com/*
+// @exclude     https://twitter.com/i/*
+// @exclude     https://twitter.com/intent/*
 // run-at       document-idle
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_registerMenuCommand
 // @grant       GM_addStyle
 // ==/UserScript==
-(() => {
+(function() {
   'use strict';
 
   const SPLIT_WORD = ',/';
@@ -194,15 +195,17 @@
       GM_setValue(flagName, tempFlag);
 
       if (flagName === 'autoRefresh_flag') {
-        if (tempFlag) {
-          AUTO_REFRESH_OBSERVER.observe(g_notifyNewTweetBtn, { childList: true });
-        } else {
-          AUTO_REFRESH_OBSERVER.disconnect();
+        if (isTargetPage()) {
+          if (tempFlag) {
+            AUTO_REFRESH_OBSERVER.observe(g_notifyNewTweetBtn, { childList: true });
+          } else {
+            AUTO_REFRESH_OBSERVER.disconnect();
+          }
         }
       } else {
         FLAG_LIST[flagName] = tempFlag;
 
-        if (flagName !== 'style_flag') {
+        if (isTargetPage() && flagName !== 'style_flag') {
           FORM_FLAG_LIST[flagName][1].classList.toggle(RADIO_BTN_CLASS);
         }
       }
@@ -236,16 +239,14 @@
       mute_userId_flag: [STRINGS.muteUserId, {}]
     };
 
-    for (let key in commandMenuObj) {
-      if (commandMenuObj.hasOwnProperty(key)) {
-        if (typeof GM_getValue(key) === 'undefined') GM_setValue(key, true);
+    Object.keys(commandMenuObj).forEach(key => {
+      if (typeof GM_getValue(key) === 'undefined') GM_setValue(key, true);
 
-        GM_registerMenuCommand(
-          commandMenuObj[key][0],
-          toggleFlag.bind(commandMenuObj[key][1][key], key)
-        );
-      }
-    }
+      GM_registerMenuCommand(
+        commandMenuObj[key][0],
+        toggleFlag.bind(commandMenuObj[key][1][key], key)
+      );
+    });
 
     GM_registerMenuCommand(STRINGS.setTime, displayTimeInputPrompt);
 
@@ -253,11 +254,11 @@
   }
 
   function initSettings() {
-    for (let key in MUTE_WORDS_ARRAY) {
-      if (MUTE_WORDS_ARRAY.hasOwnProperty(key) && GM_getValue(key)) {
+    Object.keys(MUTE_WORDS_ARRAY).forEach(key => {
+      if (GM_getValue(key)) {
         MUTE_WORDS_ARRAY[key] = GM_getValue(key).split(SPLIT_WORD);
       }
-    }
+    });
 
     if (typeof GM_getValue('form_flag') === 'undefined')  {
       GM_setValue('form_flag', true);
@@ -267,11 +268,9 @@
       GM_setValue('time', '200');
     }
 
-    for (let key in FLAG_LIST) {
-      if (FLAG_LIST.hasOwnProperty(key)) {
-        FLAG_LIST[key] = GM_getValue(key);
-      }
-    }
+    Object.keys(FLAG_LIST).forEach(key => {
+      FLAG_LIST[key] = GM_getValue(key);
+    });
   }
 
   function setHeaderAndButton() {
@@ -306,7 +305,7 @@
 
     g_muteForm = document.createElement('div');
     g_muteForm.setAttribute('id', MUTE_DIV_ID);
-    g_muteForm.innerHTML = `
+    g_muteForm.insertAdjacentHTML('afterbegin', `
       <form onsubmit="return false;">
         <input type="text" id="mLtrForm" class="${FORM_CLASS}" value="" placeholder="${STRINGS.placeholder}" style="width: 418px;">
         <input type="button" id="mLtrAdd" class="${FORM_CLASS}" value="${STRINGS.addText}">
@@ -334,7 +333,7 @@
           ${STRINGS.muteUserIdLabel}
         </label>
       </div>
-    `;
+    `);
     g_muteForm.style.marginBottom = '10px';
 
     g_timeline.insertBefore(g_muteForm, g_timeline.children[0]);
@@ -344,7 +343,12 @@
 
   function muteTweet(targetNode) {
     // ツイート以外は処理しない
-    if (!targetNode.hasAttribute('data-item-id')) return;
+    if (
+      targetNode.getAttribute('data-item-type') !== 'tweet' ||
+      !targetNode.hasAttribute('data-item-id')
+    ) {
+      return;
+    }
 
     // プロモーションのツイートである場合
     if (
@@ -355,6 +359,7 @@
       return;
     }
 
+    // 引用ツイートはどのツイートに対しても満遍なく行う
     muteQuotedTweet(targetNode);
 
     // 通常のツイートの場合
@@ -364,7 +369,7 @@
       g_tweetParentNode = targetNode;
 
       if (
-        isNeedToMute() &&
+        isNeededToMute() &&
         !checkIfTweetIsMuted(tweetTextNode) &&
         FLAG_LIST.style_flag
       ) {
@@ -407,7 +412,7 @@
         g_tweetParentNode.children[1] : g_tweetParentNode.children[0];
 
       if (
-        isNeedToMute() &&
+        isNeededToMute() &&
         !checkIfTweetIsMuted(quotedTextNode.children[1]) &&
         FLAG_LIST.style_flag
       ) {
@@ -421,11 +426,11 @@
    * ミュートする必要があるかどうかチェックする．以下の場合にその必要がない．
    * ・通常モード(追加モードでも削除モードでもない)ですでに非表示だった場合
    * ・追加モードでツイートがすでに非表示だった場合(チェックする意味がない)
-   *  ・削除モードでツイートが表示されていた場合(ミュート設定の削除なので新規にミュートチェックはしない)
+   * ・削除モードでツイートが表示されていた場合(ミュート設定の削除なので新規にミュートチェックはしない)
    *
    * @return {boolean} ミュートする必要があればtrue，そうでなければfalse
    */
-  function isNeedToMute() {
+  function isNeededToMute() {
     return !(
       (!g_addFlag && !g_deleteFlag && g_tweetParentNode.classList.contains(VISIBILITY_CLASS)) ||
       (g_addFlag && g_tweetParentNode.classList.contains(VISIBILITY_CLASS)) ||
@@ -439,7 +444,7 @@
    */
   function execMuteProcess(tweetContentNode) {
     if (
-      isNeedToMute() &&
+      isNeededToMute() &&
       !checkIfTweetIsMuted(tweetContentNode.children[1]) &&
       FLAG_LIST.style_flag
     ) {
@@ -456,7 +461,7 @@
   function checkIfTweetIsMuted(tweetTextNode) {
     let mutedFlag = false;
 
-    [].forEach.call(tweetTextNode.childNodes, tweetElement => {
+    [].forEach.call(tweetTextNode.childNodes, function(tweetElement) {
       // Aタグ
       if (tweetElement.nodeName === 'A') {
         // "pic.twitter.com"(画像リンク)
@@ -582,11 +587,11 @@
     tweetTopNode.children[1].children[0].style.color = 'blue';
     // 名前部分
     tweetTopNode = tweetTopNode.children[0];
-    tweetTopNode.children[1].style.color = tweetTopNode.children[3].style.color =  'red';
+    tweetTopNode.children[1].style.color = tweetTopNode.children[3].style.color = 'red';
   }
 
   function execAddingMute(targetWord) {
-    if (!!!targetWord) return;
+    if (!targetWord) return;
 
     // 連続した区切り文字が含まれている，もしくは区切り文字自体だった場合，エラー表示
     if (
@@ -602,7 +607,7 @@
       targetWord.split(SPLIT_WORD).forEach(addMuteWord);
 
       // 追加するべき文字がなければ何もしない
-      if (!!!ADDED_MUTE_WORD_ARRAY.length) return;
+      if (!ADDED_MUTE_WORD_ARRAY.length) return;
 
       // 元のミュート配列と追加する文字配列を結合した配列を新しい配列とする
       MUTE_WORDS_ARRAY[g_muteType] = g_muteArrayTemp.concat(ADDED_MUTE_WORD_ARRAY);
@@ -633,7 +638,7 @@
   }
 
   function execDeletingMute(targetWord) {
-    if (!!!targetWord) return;
+    if (!targetWord) return;
 
     if (
       targetWord.includes(SPLIT_WORD.repeat(2)) || targetWord === SPLIT_WORD
@@ -685,7 +690,7 @@
   }
 
   function processAddedTweets(mutation) {
-    if (!!!mutation.addedNodes.length) return;
+    if (!mutation.addedNodes.length) return;
 
     // ミュート処理
     const nodesList = mutation.addedNodes;
@@ -701,7 +706,7 @@
     if (g_timeoutId) clearTimeout(g_timeoutId);
 
     // 高さが0ならば処理を終わる
-    if (!!!g_screenHeight) return;
+    if (!g_screenHeight) return;
 
     let nodeHeightSum = 0;
 
@@ -717,15 +722,28 @@
     }, parseInt(FLAG_LIST.time, 10));
   }
 
+  /**
+   * 現在のページが対象のページ(ホーム・検索)かどうかチェックする．
+   * 対象のページではミュートフォームを作ったりミュート処理をしたりする．
+   *
+   * @return {boolean} 対象のページであればtrue，そうでなければfalse
+   */
+  function isTargetPage() {
+    return /^https\:\/\/twitter\.com\/(search\?.*?)?$/.test(location.href);
+  }
+
   function resetData() {
-    for (let key in FORM_FLAG_LIST) {
-      if (FORM_FLAG_LIST.hasOwnProperty(key)) {
-        FORM_FLAG_LIST[key].pop();
-      }
+    Object.keys(FORM_FLAG_LIST).forEach(key => {
+      if (FORM_FLAG_LIST[key].length > 1) FORM_FLAG_LIST[key].pop();
+    });
+
+    if (g_streamItems) {
+      ADDED_TWEET_OBSERVER.disconnect();
     }
 
-    ADDED_TWEET_OBSERVER.disconnect();
-    AUTO_REFRESH_OBSERVER.disconnect();
+    if (g_notifyNewTweetBtn) {
+      AUTO_REFRESH_OBSERVER.disconnect();
+    }
 
     if (g_timeoutId) {
       clearTimeout(g_timeoutId);
@@ -773,15 +791,13 @@
     g_muteInputForm = document.getElementById('mLtrForm');
 
     // フラグリストのそれに対応するノードのセット
-    for (let key in FORM_FLAG_LIST) {
-      if (FORM_FLAG_LIST.hasOwnProperty(key)) {
-        FORM_FLAG_LIST[key].push(document.getElementById(FORM_FLAG_LIST[key][0]));
+    Object.keys(FORM_FLAG_LIST).forEach(key => {
+      FORM_FLAG_LIST[key].push(document.getElementById(FORM_FLAG_LIST[key][0]));
 
-        if (GM_getValue(key)) {
-          FORM_FLAG_LIST[key][1].classList.add(RADIO_BTN_CLASS);
-        }
+      if (GM_getValue(key)) {
+        FORM_FLAG_LIST[key][1].classList.add(RADIO_BTN_CLASS);
       }
-    }
+    });
 
     ADDED_TWEET_OBSERVER.observe(g_streamItems, { childList: true });
 
@@ -797,7 +813,8 @@
   setupCommandMenu();
   initSettings();
 
-  main();
+  // 対象ページだったらメイン処理を実行
+  if (isTargetPage()) main();
 
   // ページ遷移オブザーバー ----------------------------------------------------
   new MutationObserver(mutations => {
@@ -811,7 +828,7 @@
   }).observe(document.getElementById('doc'), { attributes: true });
 
   // クリックイベントリスナー --------------------------------------------------
-  document.addEventListener('click', e => {
+  document.addEventListener('click', function(e) {
     const targetNode = e.target;
 
     switch (targetNode.id) {
