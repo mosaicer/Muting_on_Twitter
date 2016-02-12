@@ -1,3 +1,6 @@
+* version 7.2
+  - Fix bugs
+    * support for change by Twitter
 * version 7.1
   - Fix bugs
     + issue4
