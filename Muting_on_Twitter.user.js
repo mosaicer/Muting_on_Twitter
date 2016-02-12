@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     7.1
+// @version     7.2
 // @match       https://twitter.com/*
 // @exclude     https://twitter.com/i/*
 // @exclude     https://twitter.com/intent/*
@@ -359,12 +359,14 @@
       return;
     }
 
-    // 引用ツイートはどのツイートに対しても満遍なく行う
     muteQuotedTweet(targetNode);
 
     // 通常のツイートの場合
     if (targetNode.children[0].nodeName === 'DIV') {
-      const tweetTextNode = targetNode.children[0].children[1].children[1];
+      const tweetContextNode = targetNode.children[0].children[1];
+      // 引用ツイートがある場合は位置がずれる
+      const tweetTextNode = tweetContextNode.children[1].className === 'u-hiddenVisually' ?
+        tweetContextNode.children[2].children[0] : tweetContextNode.children[1];
 
       g_tweetParentNode = targetNode;
 
@@ -373,7 +375,7 @@
         !checkIfTweetIsMuted(tweetTextNode) &&
         FLAG_LIST.style_flag
       ) {
-        changeTweetTopStyle(targetNode.children[0].children[1].children[0]);
+        changeTweetTopStyle(tweetContextNode.children[0]);
       }
     }
     /**
@@ -408,6 +410,7 @@
     [].forEach.call(targetNode.querySelectorAll('.QuoteTweet'), tweetNode => {
       g_tweetParentNode = tweetNode.querySelector('.tweet-content');
 
+      // 画像を持っているかどうかで取得する位置が変わる
       const quotedTextNode = g_tweetParentNode.childElementCount > 1 ?
         g_tweetParentNode.children[1] : g_tweetParentNode.children[0];
 
@@ -445,7 +448,7 @@
   function execMuteProcess(tweetContentNode) {
     if (
       isNeededToMute() &&
-      !checkIfTweetIsMuted(tweetContentNode.children[1]) &&
+      !checkIfTweetIsMuted(tweetContentNode.children[1].children[0]) &&
       FLAG_LIST.style_flag
     ) {
       changeTweetTopStyle(tweetContentNode.children[0]);
