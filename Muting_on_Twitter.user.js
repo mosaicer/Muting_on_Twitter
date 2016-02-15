@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     7.2
+// @version     7.3
 // @match       https://twitter.com/*
 // @exclude     https://twitter.com/i/*
 // @exclude     https://twitter.com/intent/*
@@ -115,6 +115,7 @@
     mute_tag_flag: true,
     mute_userId_flag: true,
     form_flag: true,
+    tweet_box_flag: true,
     time: '200'
   };
   const FORM_FLAG_LIST = {
@@ -264,6 +265,10 @@
       GM_setValue('form_flag', true);
     }
 
+    if (typeof GM_getValue('tweet_box_flag') === 'undefined')  {
+      GM_setValue('tweet_box_flag', true);
+    }
+
     if (typeof GM_getValue('time') === 'undefined') {
       GM_setValue('time', '200');
     }
@@ -299,8 +304,14 @@
 
       leftDashBoard.insertBefore(btnToOpenCloseTweet, leftDashBoard.children[0]);
 
-      document.querySelector('[data-condensed-text]')
-        .setAttribute('data-condensed-text', STRINGS.tweetFormText);
+      // 中身がなければ別の値を変えて対応して，あればテキスト自体を直で変える
+      const tweetBox = document.getElementById('tweet-box-home-timeline');
+      if (tweetBox.childElementCount < 1) {
+        document.querySelector('[data-condensed-text]')
+          .setAttribute('data-condensed-text', STRINGS.tweetFormText);
+      } else {
+        tweetBox.textContent = STRINGS.tweetFormText;
+      }
     }
 
     g_muteForm = document.createElement('div');
@@ -782,6 +793,7 @@
     // ホームならばそれに必要なTwitter側の各ノードを取得
     if (g_homeUrlFlag) {
       g_tweetBox = document.querySelector('.timeline-tweet-box');
+      if (!FLAG_LIST.tweet_box_flag) g_tweetBox.classList.add(VISIBILITY_CLASS);
 
       g_topBar = document.getElementById('doc').children[0];
       g_pageOuter = document.getElementById('page-outer');
@@ -839,13 +851,17 @@
       case OPEN_CLOSE_ID:
         g_muteForm.classList.toggle(VISIBILITY_CLASS);
 
-        const tempFlag = !FLAG_LIST.form_flag;
-        FLAG_LIST.form_flag = tempFlag;
-        GM_setValue('form_flag', tempFlag);
+        const tempFormFlag = !FLAG_LIST.form_flag;
+        FLAG_LIST.form_flag = tempFormFlag;
+        GM_setValue('form_flag', tempFormFlag);
         break;
       // ツイート送信フォームの開閉
       case OPEN_CLOSE_TWEET_ID:
         g_tweetBox.classList.toggle(VISIBILITY_CLASS);
+
+        const tempTbFlag = !FLAG_LIST.tweet_box_flag;
+        FLAG_LIST.tweet_box_flag = tempTbFlag;
+        GM_setValue('tweet_box_flag', tempTbFlag);
         break;
       // それぞれのミュート関連ボタン
       case 'mLtrAdd':
