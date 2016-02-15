@@ -1,3 +1,6 @@
+* version 7.3
+  - Add support for saving the state of tweet box
+  - Fix bugs
 * version 7.2
   - Fix bugs
     * support for change by Twitter
