@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     7.3
+// @version     7.4
 // @match       https://twitter.com/*
 // @exclude     https://twitter.com/i/*
 // @exclude     https://twitter.com/intent/*
@@ -377,7 +377,7 @@
       const tweetContextNode = targetNode.children[0].children[1];
       // 引用ツイートがある場合は位置がずれる
       const tweetTextNode = tweetContextNode.children[1].className === 'u-hiddenVisually' ?
-        tweetContextNode.children[2].children[0] : tweetContextNode.children[1];
+        tweetContextNode.children[2].children[0] : tweetContextNode.children[1].children[0];
 
       g_tweetParentNode = targetNode;
 
