@@ -1,3 +1,5 @@
+* version 7.5
+  - Fix a bug
 * version 7.4
   - Fix bugs
 * version 7.3
