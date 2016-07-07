@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     7.4
+// @version     7.5
 // @match       https://twitter.com/*
 // @exclude     https://twitter.com/i/*
 // @exclude     https://twitter.com/intent/*
@@ -304,14 +304,8 @@
 
       leftDashBoard.insertBefore(btnToOpenCloseTweet, leftDashBoard.children[0]);
 
-      // 中身がなければ別の値を変えて対応して，あればテキスト自体を直で変える
-      const tweetBox = document.getElementById('tweet-box-home-timeline');
-      if (tweetBox.childElementCount < 1) {
-        document.querySelector('[data-condensed-text]')
-          .setAttribute('data-condensed-text', STRINGS.tweetFormText);
-      } else {
-        tweetBox.textContent = STRINGS.tweetFormText;
-      }
+      document.querySelector('[data-condensed-text]')
+        .setAttribute('data-condensed-text', STRINGS.tweetFormText);
     }
 
     g_muteForm = document.createElement('div');
