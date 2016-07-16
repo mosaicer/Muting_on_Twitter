@@ -8,7 +8,7 @@ How to use (使い方)
 Features (機能)
 ===============
 __This user script enables to mute texts/links/tags/userIDs on "Twitter Web Client".__
-* __This user script also works on "Search page".__
+* __This user script also works on "Search page" and "List page".__
 * __Your timeline is refreshed automatically.__
   - you disable/enable this feature by using command menus.
 * This user script decides a language from a language of your browser.
