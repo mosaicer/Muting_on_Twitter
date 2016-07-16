@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     7.5
+// @version     8.0
 // @match       https://twitter.com/*
 // @exclude     https://twitter.com/i/*
 // @exclude     https://twitter.com/intent/*
@@ -140,7 +140,7 @@
   let g_pageOuter;
   let g_rightDashBoard;
 
-  let g_homeUrlFlag;
+  let g_homeOrListFlag;
   // 追加モードかどうかのフラグ
   let g_addFlag = false;
   // 削除モードかどうかのフラグ
@@ -280,7 +280,8 @@
 
   function setHeaderAndButton() {
     const btnToOpenCloseMuteForm = document.createElement('div');
-    const leftDashBoard = g_homeUrlFlag ? g_pageContainer.children[0] :
+    const leftDashBoard = g_homeOrListFlag ?
+      document.querySelector('[class="dashboard dashboard-left"]') :
       document.querySelector('.SidebarCommonModules');
 
     btnToOpenCloseMuteForm.setAttribute('id', OPEN_CLOSE_ID);
@@ -292,7 +293,8 @@
 
     leftDashBoard.insertBefore(btnToOpenCloseMuteForm, leftDashBoard.children[0]);
 
-    if (g_homeUrlFlag) {
+    // ホーム画面の場合
+    if (location.href === 'https://twitter.com/') {
       const btnToOpenCloseTweet = document.createElement('div');
 
       btnToOpenCloseTweet.setAttribute('id', OPEN_CLOSE_TWEET_ID);
@@ -306,6 +308,10 @@
 
       document.querySelector('[data-condensed-text]')
         .setAttribute('data-condensed-text', STRINGS.tweetFormText);
+    }
+    // リスト画面の場合は邪魔なスペースを非表示にする
+    else if (/^https\:\/\/twitter\.com\/\w+\/lists\/\w+$/.test(location.href)) {
+      document.querySelector('.content-header').style.display = 'none';
     }
 
     g_muteForm = document.createElement('div');
@@ -387,7 +393,7 @@
       ホームのページの会話のツイートの場合
       <ol class="conversation-module stream-items js-navigable-stream" data-ancestors="687474228690419713">...</ol>
      */
-    else if (g_homeUrlFlag) {
+    else if (g_homeOrListFlag) {
       Array.from(targetNode.children[0].children).slice(1).forEach(
         tweetNode => {
           if (tweetNode.className !== 'missing-tweets-bar') {
@@ -507,7 +513,7 @@
         if (tweetElement.nodeName === '#text') {
           mutedFlag = checkIfTextHasMuteWord(MUTE_WORD_TYPE, tweetElement);
 
-          if (!g_deleteFlag && !g_addFlag && FLAG_LIST.style_flag && g_homeUrlFlag) {
+          if (!g_deleteFlag && !g_addFlag && FLAG_LIST.style_flag && g_homeOrListFlag) {
             tweetElement.parentNode.style.fontWeight = 'bold';
           }
         }
@@ -731,13 +737,13 @@
   }
 
   /**
-   * 現在のページが対象のページ(ホーム・検索)かどうかチェックする．
+   * 現在のページが対象のページ(ホーム・検索・リスト)かどうかチェックする．
    * 対象のページではミュートフォームを作ったりミュート処理をしたりする．
    *
    * @return {boolean} 対象のページであればtrue，そうでなければfalse
    */
   function isTargetPage() {
-    return /^https\:\/\/twitter\.com\/(search\?.*?)?$/.test(location.href);
+    return /^https\:\/\/twitter\.com\/(search\?.*?|\w+\/lists\/\w+)?$/.test(location.href);
   }
 
   function resetData() {
@@ -782,10 +788,11 @@
     g_streamItems = document.getElementById('stream-items-id');
     g_notifyNewTweetBtn = document.querySelector('[class="stream-item js-new-items-bar-container"]');
 
-    g_homeUrlFlag = location.href === 'https://twitter.com/';
+    g_homeOrListFlag =
+      /^https\:\/\/twitter\.com\/(\w+\/lists\/\w+)?$/.test(location.href);
 
     // ホームならばそれに必要なTwitter側の各ノードを取得
-    if (g_homeUrlFlag) {
+    if (location.href === 'https://twitter.com/') {
       g_tweetBox = document.querySelector('.timeline-tweet-box');
       if (!FLAG_LIST.tweet_box_flag) g_tweetBox.classList.add(VISIBILITY_CLASS);
 
@@ -827,10 +834,7 @@
 
   // ページ遷移オブザーバー ----------------------------------------------------
   new MutationObserver(mutations => {
-    if (
-      /^https\:\/\/twitter\.com\/search\?.+/.test(location.href) ||
-      mutations[0].target.className === 'route-home'
-    ) {
+    if (isTargetPage()) {
       resetData();
       main();
     }
