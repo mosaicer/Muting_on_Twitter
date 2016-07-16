@@ -1,3 +1,5 @@
+* __version 8.0__
+  - __Available on List page__
 * version 7.5
   - Fix a bug
 * version 7.4
