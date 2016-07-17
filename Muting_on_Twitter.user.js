@@ -3,7 +3,7 @@
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
 // @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
-// @version     8.0
+// @version     8.1
 // @match       https://twitter.com/*
 // @exclude     https://twitter.com/i/*
 // @exclude     https://twitter.com/intent/*
@@ -310,7 +310,7 @@
         .setAttribute('data-condensed-text', STRINGS.tweetFormText);
     }
     // リスト画面の場合は邪魔なスペースを非表示にする
-    else if (/^https\:\/\/twitter\.com\/\w+\/lists\/\w+$/.test(location.href)) {
+    else if (/^https\:\/\/twitter\.com\/\w+\/lists\/.+$/.test(location.href)) {
       document.querySelector('.content-header').style.display = 'none';
     }
 
@@ -743,7 +743,7 @@
    * @return {boolean} 対象のページであればtrue，そうでなければfalse
    */
   function isTargetPage() {
-    return /^https\:\/\/twitter\.com\/(search\?.*?|\w+\/lists\/\w+)?$/.test(location.href);
+    return /^https\:\/\/twitter\.com\/(search\?.*?|\w+\/lists\/.+)?$/.test(location.href);
   }
 
   function resetData() {
@@ -789,7 +789,7 @@
     g_notifyNewTweetBtn = document.querySelector('[class="stream-item js-new-items-bar-container"]');
 
     g_homeOrListFlag =
-      /^https\:\/\/twitter\.com\/(\w+\/lists\/\w+)?$/.test(location.href);
+      /^https\:\/\/twitter\.com\/(\w+\/lists\/.+)?$/.test(location.href);
 
     // ホームならばそれに必要なTwitter側の各ノードを取得
     if (location.href === 'https://twitter.com/') {
