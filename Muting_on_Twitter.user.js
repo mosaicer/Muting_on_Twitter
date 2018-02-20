@@ -21,7 +21,6 @@
   const STRING_RESOURCES = {
     ja: {
       setTime: '時間の設定',
-      setBgImage: '背景画像のURLの設定',
       autoRefresh: '自動更新を有効/無効にする',
       styleFlag: '各ツイートの装飾を有効/無効にする',
       muteText: 'ツイート本文についてのミュートを有効/無効にする',
@@ -47,7 +46,6 @@
     },
     en: {
       setTime: 'Set time',
-      setBgImage: 'Set url of background',
       autoRefresh: 'Disable/Enable auto refresh',
       styleFlag: 'Disable/Enable changing tweet style',
       muteText: 'Disable/Enable muting texts in tweet',
@@ -176,11 +174,6 @@
         font-weight: bold;
         color: #EE2C2C;
       }
-      .${document.body.classList[2]} {
-        background-image: url(${GM_getValue('background_image_url')});
-        background-attachment: fixed;
-        background-repeat: no-repeat;
-      }
     `);
   }
 
@@ -222,14 +215,6 @@
         FLAG_LIST.time = inputTime;
       }
     }
-    /**
-     * 背景画像のURLを入力させるダイアログを表示する（コマンドメニュー専用関数）
-     */
-    function displayBgImageUrlPrompt() {
-      const bgImageUrl = prompt('', GM_getValue('background_image_url'));
-
-      if (bgImageUrl) GM_setValue('background_image_url', bgImageUrl);
-    }
 
     const commandMenuObj = {
       autoRefresh_flag: [STRINGS.autoRefresh, {}],
@@ -250,8 +235,6 @@
     });
 
     GM_registerMenuCommand(STRINGS.setTime, displayTimeInputPrompt);
-
-    GM_registerMenuCommand(STRINGS.setBgImage, displayBgImageUrlPrompt);
   }
 
   function initSettings() {
