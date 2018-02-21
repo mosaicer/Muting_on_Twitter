@@ -22,7 +22,6 @@
     ja: {
       setTime: '時間の設定',
       autoRefresh: '自動更新を有効/無効にする',
-      styleFlag: '各ツイートの装飾を有効/無効にする',
       muteText: 'ツイート本文についてのミュートを有効/無効にする',
       muteLink: 'リンクについてのミュートを有効/無効にする',
       muteTag: 'ハッシュタグについてのミュートを有効/無効にする',
@@ -47,7 +46,6 @@
     en: {
       setTime: 'Set time',
       autoRefresh: 'Disable/Enable auto refresh',
-      styleFlag: 'Disable/Enable changing tweet style',
       muteText: 'Disable/Enable muting texts in tweet',
       muteLink: 'Disable/Enable muting links in tweet',
       muteTag: 'Disable/Enable muting hashtags in tweet',
@@ -107,7 +105,6 @@
     [MUTE_ID_TYPE]: []
   };
   const FLAG_LIST = {
-    style_flag: true,
     mute_text_flag: true,
     mute_link_flag: true,
     mute_tag_flag: true,
@@ -199,7 +196,7 @@
       } else {
         FLAG_LIST[flagName] = tempFlag;
 
-        if (isTargetPage() && flagName !== 'style_flag') {
+        if (isTargetPage()) {
           FORM_FLAG_LIST[flagName][1].classList.toggle(RADIO_BTN_CLASS);
         }
       }
@@ -218,7 +215,6 @@
 
     const commandMenuObj = {
       autoRefresh_flag: [STRINGS.autoRefresh, {}],
-      style_flag: [STRINGS.styleFlag, {}],
       mute_text_flag: [STRINGS.muteText, {}],
       mute_link_flag: [STRINGS.muteLink, {}],
       mute_tag_flag: [STRINGS.muteTag, {}],
@@ -357,19 +353,15 @@
 
     // 通常のツイートの場合
     if (targetNode.children[0].nodeName === 'DIV') {
-      const tweetContextNode = targetNode.children[0].children[1];
-      // 引用ツイートがある場合は位置がずれる
-      const tweetTextNode = tweetContextNode.children[1].className === 'u-hiddenVisually' ?
-        tweetContextNode.children[2].children[0] : tweetContextNode.children[1].children[0];
-
       g_tweetParentNode = targetNode;
 
-      if (
-        isNeededToMute() &&
-        !checkIfTweetIsMuted(tweetTextNode) &&
-        FLAG_LIST.style_flag
-      ) {
-        changeTweetTopStyle(tweetContextNode.children[0]);
+      if (isNeededToMute()) {
+        const tweetContextNode = targetNode.children[0].children[1];
+        // 引用ツイートがある場合は位置がずれる
+        const tweetTextNode = tweetContextNode.children[1].className === 'u-hiddenVisually' ?
+          tweetContextNode.children[2].children[0] : tweetContextNode.children[1].children[0];
+
+        checkIfTweetIsMuted(tweetTextNode);
       }
     }
     /**
@@ -404,18 +396,12 @@
     [].forEach.call(targetNode.querySelectorAll('.QuoteTweet'), tweetNode => {
       g_tweetParentNode = tweetNode.querySelector('.tweet-content');
 
-      // 画像を持っているかどうかで取得する位置が変わる
-      const quotedTextNode = g_tweetParentNode.childElementCount > 1 ?
-        g_tweetParentNode.children[1] : g_tweetParentNode.children[0];
+      if (isNeededToMute()) {
+        // 画像を持っているかどうかで取得する位置が変わる
+        const quotedTextNode = g_tweetParentNode.childElementCount > 1 ?
+          g_tweetParentNode.children[1] : g_tweetParentNode.children[0];
 
-      if (
-        isNeededToMute() &&
-        !checkIfTweetIsMuted(quotedTextNode.children[1]) &&
-        FLAG_LIST.style_flag
-      ) {
-        const tweetTopNode = quotedTextNode.children[0];
-
-        tweetTopNode.children[0].style.color = tweetTopNode.children[1].style.color =  'red';
+        checkIfTweetIsMuted(quotedTextNode.children[1]);
       }
     });
   }
@@ -440,12 +426,8 @@
    * @param {Node} ツイートのコンテントのノード
    */
   function execMuteProcess(tweetContentNode) {
-    if (
-      isNeededToMute() &&
-      !checkIfTweetIsMuted(tweetContentNode.children[1].children[0]) &&
-      FLAG_LIST.style_flag
-    ) {
-      changeTweetTopStyle(tweetContentNode.children[0]);
+    if (isNeededToMute()) {
+      checkIfTweetIsMuted(tweetContentNode.children[1].children[0]);
     }
   }
   /**
@@ -492,16 +474,8 @@
       }
       // それ以外
       else {
-        // テキストノード
-        if (tweetElement.nodeName === '#text') {
-          mutedFlag = checkIfTextHasMuteWord(MUTE_WORD_TYPE, tweetElement);
-
-          if (!g_deleteFlag && !g_addFlag && FLAG_LIST.style_flag && g_homeOrListFlag) {
-            tweetElement.parentNode.style.fontWeight = 'bold';
-          }
-        }
-        // STRONGタグ
-        else if (tweetElement.nodeName === 'STRONG') {
+        // テキストノードもしくはSTRONGタグ
+        if (tweetElement.nodeName === '#text' || tweetElement.nodeName === 'STRONG') {
           mutedFlag = checkIfTextHasMuteWord(MUTE_WORD_TYPE, tweetElement);
         }
       }
@@ -578,13 +552,6 @@
       case MUTE_ID_TYPE:
         return FLAG_LIST.mute_userId_flag && muteArray.some(muteWord => tweetElement.textContent.includes(muteWord));
     }
-  }
-  function changeTweetTopStyle(tweetTopNode) {
-    // 時間部分
-    tweetTopNode.children[1].children[0].style.color = 'blue';
-    // 名前部分
-    tweetTopNode = tweetTopNode.children[0];
-    tweetTopNode.children[1].style.color = tweetTopNode.children[3].style.color = 'red';
   }
 
   function execAddingMute(targetWord) {
