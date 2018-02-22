@@ -10,6 +10,7 @@
 // run-at       document-idle
 // @grant       GM_getValue
 // @grant       GM_setValue
+// @grant       GM_deleteValue
 // @grant       GM_registerMenuCommand
 // @grant       GM_addStyle
 // ==/UserScript==
@@ -731,6 +732,19 @@
     }
   }
 
+  /**
+   * 使われなくなった設定を削除する。
+   */
+  function removeUnusedSetting() {
+    if (typeof GM_getValue('background_image_url') !== 'undefined')  {
+      GM_deleteValue('background_image_url');
+    }
+
+    if (typeof GM_getValue('style_flag') !== 'undefined')  {
+      GM_deleteValue('style_flag');
+    }
+  }
+
   function main() {
     // Twitter側の各ノードを取得
     g_pageContainer = document.getElementById('page-container');
@@ -774,6 +788,8 @@
     // 最初は表示された全ツイートに対してミュート処理を行う
     [].forEach.call(g_streamItems.children, muteTweet);
   }
+
+  removeUnusedSetting();
 
   defineStyles();
   setupCommandMenu();
