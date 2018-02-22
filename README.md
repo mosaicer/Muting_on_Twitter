@@ -22,16 +22,10 @@ __This user script enables expanding the timeline.__
 
 ![the expanded timeline](https://box.c.yimg.jp/res/box-l-ifzsxby3sf3p7ibx45hzwgzsne-1001?uid=a45b5a48-61f2-483c-9001-dcbfdccc81ca&etag=6696f1cde7f91ef4b9d9884c9f702c9a "the expanded timeline")
 
-__This user script changes tweets' style.__
-* promoted tweets are removed.
-* letters which represent username and userID turn red.
-* letters which represent time turn blue.
-* texts(contents) of tweets are emphasized.
+__This user script removes some annoying tweets.__
+* Promoted tweets.
 
 ![Firefox+Greasemoneky](https://box.c.yimg.jp/res/box-l-ifzsxby3sf3p7ibx45hzwgzsne-1001?uid=50a81d94-f68e-422a-ac75-bf78f04c32f3&etag=15d072f4ebc353a8db769b27ab246b6d "Firefox+Greasemoneky")
-
-__This user script can set background image on home.__
-* please input the url of background image to prompt from command menus.
 
 ----------------------------------------------------------------------------------
 
@@ -50,15 +44,10 @@ __このユーザースクリプトは、テキスト/リンク/タグ/ユーザ
 __タイムラインを拡大することができます。__
 * 画像は上記のものをご覧ください。
 
-__また、ツイートのスタイルを変更します。__
-* プロモーションのツイートを消去します。
-* ユーザーネーム・ユーザーIDは赤く、時間は青くします。
-* ツイート本文は太字になります。
+__いくつかの迷惑なツイートを消去します。__
+* プロモーションのツイート
 
 ![Firefox+Greasemonekyで動かしたときのスクリーンショット](https://box.c.yimg.jp/res/box-l-ifzsxby3sf3p7ibx45hzwgzsne-1001?uid=18852d81-11e7-4c2b-ac74-37ed38ae63c0&etag=b011505e3767a384a6f79ab30008d5c3 "Firefox+Greasemonekyで動かしたときのスクリーンショット")
-
-__ホームの背景画像をセットすることができます。__
-* コマンドメニューから背景画像のURLを入力してください。
 
 Notes (備考)
 =============

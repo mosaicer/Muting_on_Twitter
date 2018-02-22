@@ -2,7 +2,7 @@
 // @name        Muting on Twitter
 // @namespace   https://github.com/mosaicer
 // @author      mosaicer
-// @description Mutes texts/links/tags/userIDs on Twitter and changes tweets' style
+// @description Mutes texts/links/tags/userIDs on Twitter
 // @version     8.1
 // @match       https://twitter.com/*
 // @exclude     https://twitter.com/i/*
