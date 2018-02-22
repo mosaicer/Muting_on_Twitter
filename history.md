@@ -1,3 +1,7 @@
+* version 8.2
+  - Deleted the following features.
+    + change tweets' style
+    + set the background image on home page
 * version 8.1
   - Fix a bug
 * __version 8.0__
