@@ -350,6 +350,15 @@
       return;
     }
 
+    // 他人がいいねしたツイート、もしくは、他人の過去のリツイートの場合
+    if (
+      targetNode.style.display !== 'none' &&
+      JSON.parse(targetNode.getAttribute('data-suggestion-json')).suggestion_details.suggestion_type
+    ) {
+      targetNode.style.display = 'none';
+      return;
+    }
+
     muteQuotedTweet(targetNode);
 
     // 通常のツイートの場合
