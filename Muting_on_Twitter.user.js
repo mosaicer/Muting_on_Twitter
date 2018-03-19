@@ -338,8 +338,10 @@
       targetNode.getAttribute('data-item-type') !== 'tweet' ||
       !targetNode.hasAttribute('data-item-id')
     ) {
-      // 最近のハイライトは非表示にする
-      if (targetNode.getAttribute('data-item-type') === 'recap_entry') {
+      // 最近のハイライトやTL上のおすすめユーザーは非表示にする
+      if (
+        targetNode.getAttribute('data-item-type') === 'recap_entry' ||
+        targetNode.getAttribute('data-item-type') === 'who_to_follow_entry') {
         targetNode.style.display = 'none';
       }
 
