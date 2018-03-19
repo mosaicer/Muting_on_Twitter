@@ -333,38 +333,10 @@
   }
 
   function muteTweet(targetNode) {
-    // ツイート以外は処理しない
-    if (
-      targetNode.getAttribute('data-item-type') !== 'tweet' ||
-      !targetNode.hasAttribute('data-item-id')
-    ) {
-      // 最近のハイライトやTL上のおすすめユーザーは非表示にする
-      if (
-        targetNode.getAttribute('data-item-type') === 'recap_entry' ||
-        targetNode.getAttribute('data-item-type') === 'who_to_follow_entry') {
-        targetNode.style.display = 'none';
-      }
-
-      return;
-    }
-
-    // プロモーションのツイートである場合
-    if (
-      targetNode.style.display !== 'none' &&
-      targetNode.querySelector('[data-promoted="true"]')
-    ) {
+    // 邪魔なコンテンツの場合は非表示にして以降の処理を中断する
+    if (isAnnoyingContent(targetNode)) {
       targetNode.style.display = 'none';
       return;
-    }
-
-    if (targetNode.style.display !== 'none') {
-      const suggestion = JSON.parse(targetNode.getAttribute('data-suggestion-json'));
-
-      // 他人がいいねしたツイート、もしくは、他人の過去のリツイートの場合
-      if (suggestion && suggestion.suggestion_details.suggestion_type) {
-        targetNode.style.display = 'none';
-        return;
-      }
     }
 
     muteQuotedTweet(targetNode);
@@ -422,6 +394,37 @@
         checkIfTweetIsMuted(quotedTextNode.children[1]);
       }
     });
+  }
+  /**
+   * 対象のツイートが邪魔なコンテンツであるかどうかを確認する。
+   *
+   * @param {Node} ツイートの親ノード
+   * @return {boolean} 邪魔なコンテンツの場合はtrue，そうでなければfalse
+   */
+  function isAnnoyingContent(targetNode) {
+    const itemType = targetNode.getAttribute('data-item-type');
+
+    // ツイート以外
+    if (itemType !== 'tweet') {
+      return true;
+    }
+
+    // プロモーションのツイート
+    if (targetNode.children[0].getAttribute('data-promoted')) {
+      return true;
+    }
+
+    // JSONデータを取得
+    const suggestion = JSON.parse(targetNode.getAttribute('data-suggestion-json'));
+
+    // JSONデータが存在していて、なおかつ、その中にタイプが存在していた場合
+    // →他人がいいねしたツイートや過去のリツイート
+    if (suggestion && suggestion.suggestion_details.suggestion_type) {
+      return true;
+    }
+
+    // 上記以外は通常のツイートとする
+    return false;
   }
   /**
    * ミュートする必要があるかどうかチェックする．以下の場合にその必要がない．
