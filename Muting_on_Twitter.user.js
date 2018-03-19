@@ -358,10 +358,10 @@
     }
 
     if (targetNode.style.display !== 'none') {
-      const suggestionDetails = JSON.parse(targetNode.getAttribute('data-suggestion-json')).suggestion_details;
+      const suggestion = JSON.parse(targetNode.getAttribute('data-suggestion-json'));
 
       // 他人がいいねしたツイート、もしくは、他人の過去のリツイートの場合
-      if (suggestionDetails && suggestionDetails.suggestion_type) {
+      if (suggestion && suggestion.suggestion_details.suggestion_type) {
         targetNode.style.display = 'none';
         return;
       }
