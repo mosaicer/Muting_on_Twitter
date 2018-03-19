@@ -338,6 +338,11 @@
       targetNode.getAttribute('data-item-type') !== 'tweet' ||
       !targetNode.hasAttribute('data-item-id')
     ) {
+      // 最近のハイライトは非表示にする
+      if (targetNode.getAttribute('data-item-type') === 'recap_entry') {
+        targetNode.style.display = 'none';
+      }
+
       return;
     }
 
