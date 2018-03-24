@@ -419,7 +419,7 @@
 
     // JSONデータが存在していて、なおかつ、そのタイプが通常ツイートではない場合
     // →他人がいいねしたツイートや過去のリツイート
-    if (suggestion && suggestion.suggestion_details.suggestion_type !== 'RankedOrganicTweet') {
+    if (suggestion && suggestion.suggestion_details.suggestion_type && suggestion.suggestion_details.suggestion_type !== 'RankedOrganicTweet') {
       return true;
     }
 
