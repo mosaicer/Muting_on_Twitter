@@ -770,7 +770,7 @@
     g_pageContainer = document.getElementById('page-container');
     g_timeline = document.getElementById('timeline') || document.querySelector('.GridTimeline');
     g_streamItems = document.getElementById('stream-items-id');
-    g_notifyNewTweetBtn = document.querySelector('[class="stream-item js-new-items-bar-container"]');
+    g_notifyNewTweetBtn = document.querySelector('[class*="stream-item js-new-items-bar-container"]');
 
     g_homeOrListFlag =
       /^https\:\/\/twitter\.com\/(\w+\/lists\/.+)?$/.test(location.href);
