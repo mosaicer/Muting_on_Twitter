@@ -820,6 +820,52 @@
 
   // ページ遷移オブザーバー ----------------------------------------------------
   new MutationObserver(mutations => {
+    // 影響範囲を絞るため、MutationRecordが1つの場合のみ処理を行う
+    if (mutations.length === 1) {
+      // div#doc
+      const mutation = mutations[0];
+
+      // 影響範囲を絞るため、変更された属性のローカル名が一致する場合のみ処理を行う
+      if (mutation.attributeName === 'aria-hidden') {
+        // 属性が変更された要素が、変更された属性を持っている場合＝タイムラインが背面になりツイートなどが最前面になった場合
+        if (mutation.target.hasAttribute('aria-hidden')) {
+          // 念のため、当該要素の値がtrueの場合のみ処理を行うようにする
+          if (mutation.target.getAttribute('aria-hidden')) {
+            // 新しいツイートを読み込むための要素が存在している場合
+            // (ユーザーページではこの要素が存在しないため場合分けが必要)
+            if (g_notifyNewTweetBtn) {
+              // 自動更新処理を中断する
+              AUTO_REFRESH_OBSERVER.disconnect();
+            }
+
+            // ページ自体は遷移していないため、以降のメイン処理を行わないようにする
+            return;
+          }
+        }
+        // そうではない場合＝タイムラインが最前面になった場合
+        else {
+          // 新しいツイートを読み込むための要素が存在している場合
+          // (ユーザーページではこの要素が存在しないため場合分けが必要)
+          if (g_notifyNewTweetBtn) {
+            // 当該要素の要素数が1の場合＝新着ツイートが存在する場合
+            // (新着ツイートが存在する場合、当該要素にbutton要素が追加されるため、当該要素の要素数が1となる)
+            if (g_notifyNewTweetBtn.childElementCount === 1) {
+              g_autoRefreshFlag = true;
+              g_screenHeight = window.pageYOffset;
+              // 当該要素直下の要素(=button要素)を押下して、新着ツイートの読み込みを行う
+              g_notifyNewTweetBtn.children[0].click();
+            }
+
+            // 自動更新処理を再開する
+            AUTO_REFRESH_OBSERVER.observe(g_notifyNewTweetBtn, { childList: true });
+          }
+
+          // ページ自体は遷移していないため、以降のメイン処理を行わないようにする
+          return;
+        }
+      }
+    }
+
     if (isTargetPage()) {
       resetData();
       main();
