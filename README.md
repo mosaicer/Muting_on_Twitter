@@ -24,6 +24,9 @@ __This user script enables expanding the timeline.__
 
 __This user script removes some annoying tweets.__
 * Promoted tweets.
+* Suggested tweets.
+* Highlights.
+* Recently recommended users.
 
 ![Firefox+Greasemoneky](https://box.c.yimg.jp/res/box-l-ifzsxby3sf3p7ibx45hzwgzsne-1001?uid=50a81d94-f68e-422a-ac75-bf78f04c32f3&etag=15d072f4ebc353a8db769b27ab246b6d "Firefox+Greasemoneky")
 
@@ -46,6 +49,9 @@ __タイムラインを拡大することができます。__
 
 __いくつかの迷惑なツイートを消去します。__
 * プロモーションのツイート
+* フォロイーのいいね/リツイート
+* ハイライト
+* 最近のオススメユーザー
 
 ![Firefox+Greasemonekyで動かしたときのスクリーンショット](https://box.c.yimg.jp/res/box-l-ifzsxby3sf3p7ibx45hzwgzsne-1001?uid=18852d81-11e7-4c2b-ac74-37ed38ae63c0&etag=b011505e3767a384a6f79ab30008d5c3 "Firefox+Greasemonekyで動かしたときのスクリーンショット")
 

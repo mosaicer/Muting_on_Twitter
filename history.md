@@ -1,3 +1,12 @@
+* version 8.3
+  - Fixed the following bugs.
+    + issue5
+    + issue6
+    + issue10
+  - Added support for hiding annoying contents.
+    + suggested tweets
+    + highlights
+    + recently recommended users
 * version 8.2
   - Deleted the following features.
     + change tweets' style
