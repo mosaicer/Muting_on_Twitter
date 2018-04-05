@@ -333,6 +333,14 @@
   }
 
   function muteTweet(targetNode) {
+    // データがスクリプトの場合、もしくは、データがユーザーの場合は以降の処理を中断する
+    if (
+      targetNode.nodeName === 'SCRIPT' ||
+      targetNode.getAttribute('data-item-type') === 'user'
+    ) {
+      return;
+    }
+
     // 邪魔なコンテンツの場合は非表示にして以降の処理を中断する
     if (isAnnoyingContent(targetNode)) {
       targetNode.style.display = 'none';
@@ -402,10 +410,8 @@
    * @return {boolean} 邪魔なコンテンツの場合はtrue，そうでなければfalse
    */
   function isAnnoyingContent(targetNode) {
-    const itemType = targetNode.getAttribute('data-item-type');
-
     // ツイート以外
-    if (itemType !== 'tweet') {
+    if (targetNode.getAttribute('data-item-type') !== 'tweet') {
       return true;
     }
 
