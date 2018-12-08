@@ -423,10 +423,15 @@
     // JSONデータを取得
     const suggestion = JSON.parse(targetNode.getAttribute('data-suggestion-json'));
 
-    // JSONデータが存在していて、なおかつ、そのタイプが通常ツイートではない場合
-    // →他人がいいねしたツイートや過去のリツイート
-    if (suggestion && suggestion.suggestion_details.suggestion_type && suggestion.suggestion_details.suggestion_type !== 'RankedOrganicTweet') {
-      return true;
+    // JSONデータが存在する場合
+    if (suggestion) {
+      const suggestionType = suggestion.suggestion_details.suggestion_type;
+
+      // タイプが通常ツイートではない場合
+      // →他人がいいねしたツイートや過去のリツイート
+      if (suggestionType && suggestionType !== 'RankedOrganicTweet' && suggestionType !== 'RankedTimelineTweet') {
+        return true;
+      }
     }
 
     // 上記以外は通常のツイートとする
