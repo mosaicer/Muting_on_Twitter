@@ -928,7 +928,7 @@
           targetNode.setAttribute('checked', 'checked');
         }
         // タイムラインの拡大/縮小
-        else if (targetNode.className.includes('top-timeline-tweet-box-user-image')) {
+        else if (targetNode.getAttribute('class') && targetNode.getAttribute('class').includes('top-timeline-tweet-box-user-image')) {
           g_timeline.classList.toggle(TL_CLASS);
           g_topBar.classList.toggle(VISIBILITY_CLASS);
           g_pageContainer.classList.toggle(VISIBILITY_CLASS);
