@@ -459,7 +459,11 @@
    */
   function execMuteProcess(tweetContentNode) {
     if (isNeededToMute()) {
-      checkIfTweetIsMuted(tweetContentNode.children[1].children[0]);
+      if (tweetContentNode.children[1].nodeName === "P") {
+        checkIfTweetIsMuted(tweetContentNode.children[2].children[0]);
+      } else {
+        checkIfTweetIsMuted(tweetContentNode.children[1].children[0]);
+      }
     }
   }
   /**
