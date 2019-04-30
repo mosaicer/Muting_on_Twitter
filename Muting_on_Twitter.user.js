@@ -157,6 +157,7 @@
   function defineStyles() {
     GM_addStyle(`
       .${FORM_CLASS} {
+        color: black;
         margin-right: 10px;
       }
       .${TL_CLASS} {
