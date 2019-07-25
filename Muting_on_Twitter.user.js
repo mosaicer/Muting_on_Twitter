@@ -8,11 +8,6 @@
 // @exclude     https://twitter.com/i/*
 // @exclude     https://twitter.com/intent/*
 // run-at       document-idle
-// @grant       GM_getValue
-// @grant       GM_setValue
-// @grant       GM_deleteValue
-// @grant       GM_registerMenuCommand
-// @grant       GM_addStyle
 // ==/UserScript==
 (function() {
   'use strict';
