@@ -10,5 +10,13 @@
 (() => {
   'use strict';
 
-
+  // observe events that nodes are added in/removed from the root node or its subtree
+  const rootNode = document.getElementById('react-root');
+  new MutationObserver(mutations =>
+    mutations.forEach(mutation =>
+      mutation.addedNodes.forEach(node => {
+        console.log(node);
+      })
+    )
+  ).observe(rootNode, { childList: true, subtree: true });
 })();
