@@ -7,7 +7,7 @@
 // @match       https://twitter.com/home
 // run-at       document-idle
 // ==/UserScript==
-(function() {
+(() => {
   'use strict';
 
 
