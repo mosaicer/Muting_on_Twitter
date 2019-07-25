@@ -43,6 +43,11 @@
       mutation.addedNodes.forEach(node => {
         if (isContainerOfTweetNodes(node)) {
           console.log(node);
+
+          const parentOfTweetNodes =
+            node.querySelector('[aria-label="タイムライン: ホームタイムライン"]').children[0].children[0];
+
+          parentOfTweetNodes.childNodes.forEach(muteIfNeed);
         }
       })
     )
