@@ -25,7 +25,15 @@
   };
 
   const needToMute = function checkIfTweetNodeNeedsTobeMuted(tweetNode) {
+    if (isPromotion(tweetNode)) return true;
+
     return false;
+  };
+
+  const isPromotion = function checkIfTweetNodeIsPromotion(tweetNode) {
+    // MEMO: it's difficult to find the text "Promotion" simply
+    // MEMO: it's easy to find the icon that indicates promotion, but I think that the icon easily changes
+    return tweetNode.children[1].children.length === 3;
   };
 
   // observe events that nodes are added in/removed from the root node or its subtree
