@@ -19,6 +19,7 @@
     function startObservingTheTweetsThatSystemAdds(parentOfTweetNodes) {
       new MutationObserver(mutations =>
         mutations.forEach(mutation =>
+          mutation.addedNodes.forEach(muteIfNeed)
         )
       ).observe(parentOfTweetNodes, { childList: true });
     };
