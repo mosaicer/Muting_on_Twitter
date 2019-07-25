@@ -15,6 +15,14 @@
       return node.querySelector('[aria-label="タイムライン: ホームタイムライン"]');
     };
 
+  const observeNewTweets =
+    function startObservingTheTweetsThatSystemAdds(parentOfTweetNodes) {
+      new MutationObserver(mutations =>
+        mutations.forEach(mutation =>
+        )
+      ).observe(parentOfTweetNodes, { childList: true });
+    };
+
   const muteIfNeed = function tryToHideTweetNode(node) {
     const tweetNode = node.querySelector('[data-testid="tweet"]');
     console.log(tweetNode);
@@ -48,6 +56,8 @@
             node.querySelector('[aria-label="タイムライン: ホームタイムライン"]').children[0].children[0];
 
           parentOfTweetNodes.childNodes.forEach(muteIfNeed);
+
+          observeNewTweets(parentOfTweetNodes);
         }
       })
     )
