@@ -5,6 +5,7 @@
 // @description Mutes texts/links/tags/userIDs on Twitter
 // @version     8.4
 // @match       https://twitter.com/home
+// @match       https://twitter.com/
 // run-at       document-idle
 // ==/UserScript==
 (() => {
