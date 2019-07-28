@@ -1,4 +1,4 @@
-# Supporting new Twitter UI is in progress on the branch [support-newTwitterUI branch](https://github.com/mosaicer/Muting_on_Twitter/tree/support-newTwitterUI).
+# Supporting new Twitter UI is in progress on the branch [support-newTwitterUI](https://github.com/mosaicer/Muting_on_Twitter/tree/support-newTwitterUI).
 
 ***
 
