@@ -1,3 +1,7 @@
+# Supporting new Twitter UI is in progress on the branch [support-newTwitterUI branch](https://github.com/mosaicer/Muting_on_Twitter/tree/support-newTwitterUI).
+
+***
+
 How to use (使い方)
 ===================
 1. Install Greasemonkey([en-US](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) / [ja](https://addons.mozilla.org/ja/firefox/addon/greasemonkey/)) on Firefox / [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) on Chrome.
