@@ -11,6 +11,18 @@
 (() => {
   'use strict';
 
+  const isContainerOfTweetHeader =
+    function checkIfTheNodeContainsHeaderOfTweets(node) {
+      return node.querySelector('[aria-label="トップツイートがオフになります"]');
+    };
+
+  const createAndAddFormForMuting =
+    function createAndAddFormNodeToConfigureSettingToMuteTweets(parentOfHeader) {
+      console.log(parentOfHeader);
+
+      // TODO: create nodes programmatically and set event listeners to them
+    };
+
   const isContainerOfTweetNodes =
     function checkIfTheNodeContainsParentNodeOfTweetNodes(node) {
       return node.querySelector('[aria-label="タイムライン: ホームタイムライン"]');
@@ -51,6 +63,13 @@
   new MutationObserver(mutations =>
     mutations.forEach(mutation =>
       mutation.addedNodes.forEach(node => {
+        if (isContainerOfTweetHeader(node)) {
+          console.log(node);
+
+          const parentOfHeader = node.children[0].children[0];
+          createAndAddFormForMuting(parentOfHeader);
+        }
+
         if (isContainerOfTweetNodes(node)) {
           console.log(node);
 
