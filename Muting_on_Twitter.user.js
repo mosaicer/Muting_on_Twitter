@@ -38,6 +38,13 @@
     };
 
   const muteIfNeed = function tryToHideTweetNode(node) {
+    if (!isElement(node)) {
+      console.log(
+        `muteIfNeed: node is not Element, but ${Object.prototype.toString.call(node)}.`
+      );
+      return;
+    }
+
     const tweetNode = node.querySelector('[data-testid="tweet"]');
     console.log(tweetNode);
 
@@ -58,11 +65,22 @@
     return tweetNode.children[1].children.length === 3;
   };
 
+  const isElement = function checkIfValueIsInstanceOfElement(value) {
+    return value instanceof Element;
+  }
+
   // observe events that nodes are added in/removed from the root node or its subtree
   const rootNode = document.getElementById('react-root');
   new MutationObserver(mutations =>
     mutations.forEach(mutation =>
       mutation.addedNodes.forEach(node => {
+        if (!isElement(node)) {
+          console.log(
+            `Top MutationObserver: node is not Element, but ${Object.prototype.toString.call(node)}.`
+          );
+          return;
+        }
+
         if (isContainerOfTweetHeader(node)) {
           console.log(node);
 
