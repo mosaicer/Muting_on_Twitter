@@ -62,7 +62,7 @@
   const isPromotion = function checkIfTweetNodeIsPromotion(tweetNode) {
     // MEMO: it's difficult to find the text "Promotion" simply
     // MEMO: it's easy to find the icon that indicates promotion, but I think that the icon easily changes
-    return tweetNode.children[1].children.length === 3;
+    return tweetNode.children[1].children.length === 5;
   };
 
   const isElement = function checkIfValueIsInstanceOfElement(value) {
