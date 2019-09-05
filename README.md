@@ -1,4 +1,4 @@
-# Supporting new Twitter UI is in progress on the branch [support-newTwitterUI](https://github.com/mosaicer/Muting_on_Twitter/tree/support-newTwitterUI).
+# This repository is no longer maintained. Please use official Twitter features instead of this script.
 
 ***
 
